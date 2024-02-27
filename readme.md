@@ -14,6 +14,7 @@ Add details about your prototype here, perhaps a few photos and how-to-use would
 
 ### Proposed project
 
+The game starts off with a car being stationary on a road, displayed on the screen. When the player presses start, a multiplication question will be shown below the car, with a timer for 15 seconds and a obstacle, like a stone, appears before the car. As the timer countdowns the car will be head towards the obstacle. If the player inputs the wrong answer, the countdown will continue and the car will continue to head towards the obstacle. If the player does not answer correctly by the time the timer runs out, the car will hit the obstacle and the game would end. If the player inputs the correct answer, the car will avoid the obstacle and the game will move on to the next question with the timer resetted.  Every 5 rounds, the timer would decrease by 1 second. 
 
 ### ALU
 
@@ -30,6 +31,13 @@ It would iterate through 50 test cases of different functions and display the 16
 For simulating error cases, io_dip[0][6] can be flipped to 1 to inverse the least significant bit, resulting in the wrong output. This will stop the test cases from running further until io_dip[0][6] is flipped back to 0, before continuing to run the following test cases. io_led[2][7] will be lit if the test case is correct and unlit if it is wrong. The leftmost 7-segment LED will also display "J" if the test case is correct and "X" if the test case is wrong.
 
 After running all test cases, "...." will be displayed on the 7-segment led and to restart the auto-tester, io_dip[0][6] can be flipped to return to the first test case.
+
+#### Functionality for proposed multiplication game
+From Manual and Auto-testing mode, users can press io_button[4] activate the game function and io_button[2] to return to Manual mode.
+
+Users are posed with multiplication questions in the form of "XX.YY" on the 7-segment led, where XX is the first number and YY is the second number. Users would have to enter the answer in binary using io_dip[2] and io_dip[1] to generate a 16 bit answer. Users can submit their answer by pressing io_button[0]. If the user submits a wrong answer, he will be expected to provide the correct answer before moving on to the next question.  
+
+After finishing all the questions, "g.o.o.d." will be displayed on the 7-segment LED.
 
 #### ALU Reference
 io_button[0] -> top button   
