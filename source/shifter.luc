@@ -1,0 +1,45 @@
+module shifter (
+    input a[16],
+    input b[4],
+    input alufn_signal[6],
+    output shift[16]
+  ) {
+  mux_2 mux_2;
+  mux_2 mux_2_16_start[16];
+  mux_2 mux_2_16_end[16];
+  
+  bit_reverser bit_reverser_start;
+  bit_reverser bit_reverser_end;
+  left_shifter_16_bit left_shifter_16_bit;
+  
+  var i;
+  const SIZE = 16;
+  
+  always {
+    mux_2_16_start.s0[15:0] = 16x{alufn_signal[0]};
+    bit_reverser_start.in = a;
+    
+    for (i=0; i<SIZE; i++) {
+      mux_2_16_start.in_0[i] = a[i];
+      mux_2_16_start.in_1[i] = bit_reverser_start.out[i];
+    }
+    
+    mux_2.in_0 = b0;
+    mux_2.in_1 = a[15];
+    mux_2.s0 = alufn_signal[1];
+    
+    left_shifter_16_bit.a = mux_2_16_start.out;
+    left_shifter_16_bit.b = b;
+    left_shifter_16_bit.pad = mux_2.out;
+    
+    bit_reverser_end.in = left_shifter_16_bit.out;
+    
+    mux_2_16_end.s0[15:0] = 16x{alufn_signal[0]};
+    for (i=0; i<SIZE; i++) {
+      mux_2_16_end.in_0[i] = left_shifter_16_bit.out[i];
+      mux_2_16_end.in_1[i] = bit_reverser_end.out[i];
+    }
+    
+    shift = mux_2_16_end.out;
+  }
+}

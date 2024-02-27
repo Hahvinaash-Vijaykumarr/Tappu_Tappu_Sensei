@@ -1,0 +1,13 @@
+module fa (
+    input a,
+    input b,
+    input ci,
+    output co,
+    output s
+  ) {
+
+  always {
+    co = (a & b) | ((ci) & (a ^ b));
+    s = (a ^ b) ^ (ci);
+  }
+}

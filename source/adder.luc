@@ -1,0 +1,25 @@
+module adder (
+    input a[16],
+    input b[16],
+    input alufn_signal[6],
+    output out[16],
+    output z,
+    output v,
+    output n
+  ) {
+    rca rca;
+    sig s[16];
+  
+  always {  
+    rca.a = a;
+    rca.b = b;
+    rca.ci = alufn_signal[0];
+    
+    s = rca.s;
+    out = s;
+    
+    z = ~(|rca.s);
+    v = ((a[15]) & (b[15] ^ alufn_signal[0]) & (~s[15])) | ((~a[15]) & (~(b[15] ^ alufn_signal[0])) & (s[15]));
+    n = s[15];
+  }
+}

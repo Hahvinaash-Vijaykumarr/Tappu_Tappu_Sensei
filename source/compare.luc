@@ -1,0 +1,19 @@
+module compare (
+    input z,
+    input v,
+    input n,
+    input alufn_signal[6],
+    output cmp
+  ) {
+    mux_4 mux;
+  
+  always {
+    mux.s0 = alufn_signal[1];
+    mux.s1 = alufn_signal[2];
+    mux.in[1] = z;
+    mux.in[2] = n ^ v;
+    mux.in[3] = z | (n ^ v);
+    
+    cmp = mux.out;
+  }
+}
