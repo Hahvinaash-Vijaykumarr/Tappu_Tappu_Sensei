@@ -14,7 +14,7 @@ Add details about your prototype here, perhaps a few photos and how-to-use would
 
 ### Proposed project
 
-The game starts off with a car being stationary on a road, displayed on the screen. When the player presses start, a multiplication question will be shown below the car, with a timer for 15 seconds and a obstacle, like a stone, appears before the car. As the timer countdowns the car will be head towards the obstacle. If the player inputs the wrong answer, the countdown will continue and the car will continue to head towards the obstacle. If the player does not answer correctly by the time the timer runs out, the car will hit the obstacle and the game would end. If the player inputs the correct answer, the car will avoid the obstacle and the game will move on to the next question with the timer resetted.  Every 5 rounds, the timer would decrease by 1 second. 
+The game starts off with a car being stationary on a road, displayed on the screen. When the player presses start, a multiplication question will be shown below the car, with a timer for 15 seconds and a obstacle, like a stone, appears before the car. As the timer countdowns the car will be head towards the obstacle. If the player inputs the wrong answer, the countdown will continue and the car will continue to head towards the obstacle. If the player does not answer correctly by the time the timer runs out, the car will hit the obstacle and the game would end. If the player inputs the correct answer, the car will avoid the obstacle and the game will move on to the next question with the timer resetted. The game will have 2 modes, easy and hard. The easy mode would have 15 second intervals per question and the hard mode would have 8 seconds interval per question.
 
 ### ALU
 
