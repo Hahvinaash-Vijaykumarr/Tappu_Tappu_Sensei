@@ -38,15 +38,14 @@ module tester (
   always {
     // default values
     out = 0;
-    z = 0;
-    v = 0;
-    n = 0;
+    z = alu.z;
+    v = alu.v;
+    n = alu.n;
     alu.a = 0;
     alu.b = 0;
     alu.alufn_signal = 0;
-    seg.values = {5b00000, 5b00000, 5b00000, 5b00000};
-    io_seg = 0;
-    io_sel = 0;
+    io_seg = seg.seg;
+    io_sel = seg.sel;
     
     true = 0;
     result = 0;
@@ -55,12 +54,8 @@ module tester (
       // waiting to start auto tester
       test.START:
         result = 0;
-        z = 0;
-        v = 0;
-        n = 0;
         seg.values = {5b00000, 5b00000, 5b00000, 5b00000};
-        io_seg = 0;
-        io_sel = 0;
+        
         if (start) {
           test.d = test.ADD1;
         }
@@ -72,21 +67,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b000000;
         ans = 16b0000000011110000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01001, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01001, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -103,21 +91,14 @@ module tester (
         alu.b = 16b0000000000001111;
         alu.alufn_signal = 6b000000;
         ans = 16b0000000000001111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01001, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01001, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -134,21 +115,14 @@ module tester (
         alu.b = 16b0000001010101010;
         alu.alufn_signal = 6b000000;
         ans = 16b0000011111111111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01001, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01001, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -165,21 +139,14 @@ module tester (
         alu.b = 16b0110101010101111;
         alu.alufn_signal = 6b000000;
         ans = 16b1100101100101111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01001, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01001, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -196,21 +163,14 @@ module tester (
         alu.b = 16b0100000111101111;
         alu.alufn_signal = 6b000000;
         ans = 16b0100010011101010;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01001, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01001, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -227,21 +187,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b000001;
         ans = 16b0000111100000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01010, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01010, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -258,21 +211,14 @@ module tester (
         alu.b = 16b0000000000000001;
         alu.alufn_signal = 6b000001;
         ans = 16b1111111111111111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01010, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01010, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -284,26 +230,19 @@ module tester (
         }
         
         
-      test.SUB3:  // underflow
-        alu.a = 16b0000000011110000;
-        alu.b = 16b0111100000000000;
+      test.SUB3:  // negative overflow
+        alu.a = 16b1000000000000000;
+        alu.b = 16b0000000000000001;
         alu.alufn_signal = 6b000001;
-        ans = 16b1000100011110000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
+        ans = 16b0111111111111111;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01010, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01010, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -315,26 +254,19 @@ module tester (
         }
         
         
-      test.SUB4:  // max positive - 0
+      test.SUB4:  // 0 - max positive
         alu.a = 16b0000000000000000;
         alu.b = 16b0111111111111111;
         alu.alufn_signal = 6b000001;
         ans = 16b1000000000000001;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01010, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01010, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -351,21 +283,14 @@ module tester (
         alu.b = 16b1111111111111000;
         alu.alufn_signal = 6b000001;
         ans = 16b1111000000001000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01010, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01010, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -382,21 +307,14 @@ module tester (
         alu.b = 16b0111100111111111;
         alu.alufn_signal = 6b000010;
         ans = 16b0000000000000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01011, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01011, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -413,21 +331,14 @@ module tester (
         alu.b = 16b0000000000000001;
         alu.alufn_signal = 6b000010;
         ans = 16b0111100111111111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01011, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01011, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -439,26 +350,19 @@ module tester (
         }
         
         
-      test.MUL3:
-        alu.a = 16b0000000000011000;
-        alu.b = 16b0000000001100000;
+      test.MUL3:  // negative x negative
+        alu.a = 16b1111111111111111;
+        alu.b = 16b1000000000000001;
         alu.alufn_signal = 6b000010;
-        ans = 16b0000100100000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
+        ans = 16b0111111111111111;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01011, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01011, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -475,21 +379,14 @@ module tester (
         alu.b = 16b0101010100000000;
         alu.alufn_signal = 6b000010;
         ans = 16b1010100000000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01011, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01011, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -506,21 +403,14 @@ module tester (
         alu.b = 16b1111111111111111;
         alu.alufn_signal = 6b000010;
         ans = 16b1111111111111110;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00000, 5b01011, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00000, 5b01011, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -537,21 +427,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b011000;
         ans = 16b0000000000000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01000, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01000, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -568,21 +451,14 @@ module tester (
         alu.b = 16b1111111111111111;
         alu.alufn_signal = 6b011000;
         ans = 16b0001010100010100;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01000, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01000, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -599,21 +475,14 @@ module tester (
         alu.b = 16b0001110011010101;
         alu.alufn_signal = 6b011000;
         ans = 16b0001110011010101;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01000, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01000, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -630,21 +499,14 @@ module tester (
         alu.b = 16b1111000011110000;
         alu.alufn_signal = 6b011000;
         ans = 16b0000000000000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01000, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01000, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -661,21 +523,14 @@ module tester (
         alu.b = 16b0101010101001010;
         alu.alufn_signal = 6b011000;
         ans = 16b0000010100001010;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01000, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01000, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -692,21 +547,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b011110;
         ans = 16b0000111100001111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01100, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01100, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -723,21 +571,14 @@ module tester (
         alu.b = 16b1111111111111111;
         alu.alufn_signal = 6b011110;
         ans = 16b1111111111111111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01100, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01100, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -754,21 +595,14 @@ module tester (
         alu.b = 16b0000111100001111;
         alu.alufn_signal = 6b011110;
         ans = 16b0000111100001111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01100, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01100, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -785,21 +619,14 @@ module tester (
         alu.b = 16b1110100011110000;
         alu.alufn_signal = 6b011110;
         ans = 16b1110111111111111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01100, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01100, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -816,21 +643,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b010110;
         ans = 16b0000111100001111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b00110, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b00110, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -847,21 +667,14 @@ module tester (
         alu.b = 16b0000111100001111;
         alu.alufn_signal = 6b010110;
         ans = 16b0000000000000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b00110, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b00110, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -878,21 +691,14 @@ module tester (
         alu.b = 16b1111000011110000;
         alu.alufn_signal = 6b010110;
         ans = 16b1111111111111111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b00110, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b00110, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -909,21 +715,14 @@ module tester (
         alu.b = 16b1010010110100111;
         alu.alufn_signal = 6b010110;
         ans = 16b1010101010101000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b00110, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b00110, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -940,21 +739,14 @@ module tester (
         alu.b = 16b1010010110100111;
         alu.alufn_signal = 6b011010;
         ans = 16b0000111100001111;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01101, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01101, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -971,21 +763,14 @@ module tester (
         alu.b = 16b1111111111111111;
         alu.alufn_signal = 6b011010;
         ans = 16b1001010101101010;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00001, 5b01101, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00001, 5b01101, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1002,21 +787,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b100000;
         ans = 16b0000000000001100;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
-        
+
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01001, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01001, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1033,21 +811,14 @@ module tester (
         alu.b = 16b0000000000001111;
         alu.alufn_signal = 6b100000;
         ans = 16b1000000000000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01001, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01001, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1064,21 +835,14 @@ module tester (
         alu.b = 16b0000000000000101;
         alu.alufn_signal = 6b100000;
         ans = 16b0001001001100000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01001, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01001, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1095,21 +859,14 @@ module tester (
         alu.b = 16b0000000000000000;
         alu.alufn_signal = 6b100001;
         ans = 16b0000000010010011;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01010, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01010, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1126,21 +883,14 @@ module tester (
         alu.b = 16b0000000000001110;
         alu.alufn_signal = 6b100001;
         ans = 16b0000000000000001;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01010, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01010, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1157,21 +907,14 @@ module tester (
         alu.b = 16b0000000000001000;
         alu.alufn_signal = 6b100001;
         ans = 16b0000000001000110;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01010, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01010, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1188,21 +931,14 @@ module tester (
         alu.b = 16b0000000000001000;
         alu.alufn_signal = 6b100011;
         ans = 16b1111111110000000;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01110, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01110, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1219,21 +955,14 @@ module tester (
         alu.b = 16b0000000000000100;
         alu.alufn_signal = 6b100011;
         ans = 16b1111100011100001;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01110, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01110, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1246,25 +975,18 @@ module tester (
         
         
       test.SRA3:
-        alu.a = 16b1000111000010100;
+        alu.a = 16b0000111000010100;
         alu.b = 16b0000000000001110;
         alu.alufn_signal = 6b100011;
-        ans = 16b1111111111111110;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
+        ans = 16b0000000000000000;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00010, 5b01110, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00010, 5b01110, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1281,21 +1003,14 @@ module tester (
         alu.b = 16b1000111000010100;
         alu.alufn_signal = 6b110011;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01110, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01110, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1312,21 +1027,14 @@ module tester (
         alu.b = 16b1000111010010100;
         alu.alufn_signal = 6b110011;
         ans = 0;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01110, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01110, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1343,21 +1051,14 @@ module tester (
         alu.b = 16b1111010100000101;
         alu.alufn_signal = 6b110011;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01110, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01110, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1374,21 +1075,14 @@ module tester (
         alu.b = 16b0111010100000101;
         alu.alufn_signal = 6b110101;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01111, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01111, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1405,21 +1099,14 @@ module tester (
         alu.b = 16b0011010100000101;
         alu.alufn_signal = 6b110101;
         ans = 0;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01111, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01111, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1436,21 +1123,14 @@ module tester (
         alu.b = 16b0011010100000101;
         alu.alufn_signal = 6b110101;
         ans = 0;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01111, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01111, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1467,21 +1147,14 @@ module tester (
         alu.b = 16b1011010100000101;
         alu.alufn_signal = 6b110101;
         ans = 0;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01111, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01111, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1498,21 +1171,14 @@ module tester (
         alu.b = 16b1111111111111100;
         alu.alufn_signal = 6b110101;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b01111, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b01111, 5b00101};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1529,21 +1195,14 @@ module tester (
         alu.b = 16b0101011010000000;
         alu.alufn_signal = 6b110111;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b00111, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b00111, 5b00001};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1560,21 +1219,14 @@ module tester (
         alu.b = 16b0101011010000000;
         alu.alufn_signal = 6b110111;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b00111, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b00111, 5b00010};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1591,21 +1243,14 @@ module tester (
         alu.b = 16b0101011010000000;
         alu.alufn_signal = 6b110111;
         ans = 0;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b00111, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b00111, 5b00011};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1622,21 +1267,14 @@ module tester (
         alu.b = 16b1111111111111100;
         alu.alufn_signal = 6b110111;
         ans = 1;
-        z = alu.z;
-        v = alu.v;
-        n = alu.n;
         
         if (invalid) {
           result = c{alu.out[15:1], ~alu.out[0]};
           seg.values = {5b10001, 5b00011, 5b00111, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         else {
           result = alu.out;
           seg.values = {5b10000, 5b00011, 5b00111, 5b00100};
-          io_seg = seg.seg;
-          io_sel = seg.sel;
         }
         
         if (result == ans) {
@@ -1650,13 +1288,8 @@ module tester (
       // all tests success
       test.DONE:
         result = 0;
-        z = 0;
-        v = 0;
-        n = 0;
         true = 0;
         seg.values = {5b10010, 5b10010, 5b10010, 5b10010};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (invalid) {
           test.d = test.ADD1;

@@ -22,8 +22,8 @@ module questions (
   always {
     // default values
     seg.values = {5b00000, 5b00000, 5b00000, 5b00000};
-    io_seg = 0;
-    io_sel = 0;
+    io_seg = seg.seg;
+    io_sel = seg.sel;
     
         
     // multiplying tests
@@ -33,8 +33,6 @@ module questions (
         b = 16b0000000000000011;  // 03
         ans = 16b0000000000000110;  // 06
         seg.values = {5b00000, 5b01011, 5b00000, 5b00011};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL2;
@@ -45,8 +43,6 @@ module questions (
         b = 16b0000000000000010;  // 02
         ans = 16b0000000000011010;  //26
         seg.values = {5b00001, 5b01110, 5b00000, 5b00010};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL3;
@@ -57,8 +53,6 @@ module questions (
         b = 16b0000000000000100;  // 04
         ans = 16b0000000000001100;  // 12
         seg.values = {5b00000, 5b01110, 5b00000, 5b00100};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL4;
@@ -69,8 +63,6 @@ module questions (
         b = 16b0000000000000010;  // 02
         ans = 16b0000000001011010;  // 90
         seg.values = {5b00100, 5b01111, 5b00000, 5b00010};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL5;
@@ -81,8 +73,6 @@ module questions (
         b = 16b0000000000000101;  // 05
         ans = 16b0000000010101111;  // 175
         seg.values = {5b00011, 5b01111, 5b00000, 5b00101};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL6;
@@ -93,8 +83,6 @@ module questions (
         b = 16b0000000001001110;  // 78
         ans = 16b0000000010011100;  // 156
         seg.values = {5b00000, 5b01011, 5b10101, 5b10100};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL7;
@@ -105,8 +93,6 @@ module questions (
         b = 16b0000000000000100;  // 04
         ans = 16b0000000001101000;  // 104
         seg.values = {5b00010, 5b00110, 5b00000, 5b00100};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.MUL8;
@@ -118,8 +104,6 @@ module questions (
         b = 16b0000000000001010;  // 10
         ans = 16b00000000110011010;  // 410
         seg.values = {5b00100, 5b01010, 5b00001, 5b00000};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
         
         if (answer == ans) {
           game.d = game.DONE;
@@ -129,7 +113,5 @@ module questions (
       // all tests correct
       game.DONE:
         seg.values = {5b10111, 5b11000, 5b11000, 5b11001};
-        io_seg = seg.seg;
-        io_sel = seg.sel;
     }
 }
