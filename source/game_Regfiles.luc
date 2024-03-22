@@ -1,0 +1,97 @@
+module game_Regfiles (
+    input clk,  // clock
+    input rst,  // reset
+    input write_address[4],  // write write_address
+    input we,  // write enable
+    input data[16],  // data in
+    
+    input read_address_a[4],  // address port a
+    input read_address_b[4],  // address port b
+    output out_a[16],  // read port a
+    output out_b[16],  // read port b
+    
+    
+    // debug
+    output score[16],
+    output counter_out[16],
+    output speed_and_number[2],
+    output two_led_rows[32],
+    output two_comparison[2],
+    output add_and_zero_tracker[2]
+  ) {
+  .clk(clk) {
+    .rst(rst) {
+      dff player_score[16](#INIT(0));
+      dff game_counter[16](#INIT(0));
+      dff game_speed[16](#INIT(0));
+      dff song_number[16](#INIT(0));
+      dff game_led_row_0[16](#INIT(0));
+      dff game_led_row_1[16](#INIT(0));
+      dff compare_game_led_row_0[16](#INIT(0));
+      dff compare_game_led_row_1[16](#INIT(0));
+      dff add_score_tracker[16](#INIT(0));
+      dff zero_score_tracker[16](#INIT(0));
+    }
+  }
+
+  always {
+    
+    // write port
+    if (we) {
+      case(write_address) {
+        b0000: player_score.d = data;
+        b0001: game_counter.d = data;
+        b0010: game_speed.d = data;
+        b0011: song_number.d = data;
+        b0100: game_led_row_0.d = data;
+        b0101: game_led_row_1.d = data;
+        b0110: compare_game_led_row_0.d = data;
+        b0111: compare_game_led_row_1.d = data;
+        b1000: add_score_tracker.d = data;
+        b1001: zero_score_tracker.d = data;
+      }
+    }
+    
+    
+    // read port a
+    case(read_address_a) {
+      b0000: out_a = player_score.q;
+      b0001: out_a = game_counter.q;
+      b0010: out_a = game_speed.q;
+      b0011: out_a = song_number.q;
+      b0100: out_a = game_led_row_0.q;
+      b0101: out_a = game_led_row_1.q;
+      b0110: out_a = compare_game_led_row_0.q;
+      b0111: out_a = compare_game_led_row_1.q;
+      b1000: out_a = add_score_tracker.q;
+      b1001: out_a = zero_score_tracker.q;
+      default: out_a = 0;
+    }
+    
+    // read port b
+    case(read_address_b) {
+      b0000: out_b = player_score.q;
+      b0001: out_b = game_counter.q;
+      b0010: out_b = game_speed.q;
+      b0011: out_b = song_number.q;
+      b0100: out_b = game_led_row_0.q;
+      b0101: out_b = game_led_row_1.q;
+      b0110: out_b = compare_game_led_row_0.q;
+      b0111: out_b = compare_game_led_row_1.q;
+      b1000: out_b = add_score_tracker.q;
+      b1001: out_b = zero_score_tracker.q;
+      default: out_b = 0;
+    }
+    
+    
+    
+    // For debugging
+    score = player_score.q;
+    counter_out = game_counter.q;
+    speed_and_number = c{game_speed.q[0], song_number.q[0]};
+    two_led_rows = c{game_led_row_1.q, game_led_row_0.q};
+    two_comparison = c{compare_game_led_row_1.q[0], compare_game_led_row_0.q[0]};
+    add_and_zero_tracker = c{add_score_tracker.q[0], zero_score_tracker.q[0]};
+    
+  }
+}

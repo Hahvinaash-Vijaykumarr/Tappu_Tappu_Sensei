@@ -12,28 +12,26 @@ module au_top (
   ) {
   
   sig rst;
-  alu alu;
+  //alu alu;
 
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
     // clock. This ensures the entire FPGA comes out of reset at the same time.
     reset_conditioner reset_cond;
-    dff a[16](.rst(rst));
-    dff b[16](.rst(rst));
-    dff alufn[6](.rst(rst));
+    dff address_a[4](.rst(rst));
+    dff address_b[4](.rst(rst));
+    dff address_write[4](.rst(rst));
+    dff data[16](.rst(rst));
+    dff we[1](.rst(rst));
+    //dff alufn[6](.rst(rst));
     button_conditioner button_conditioner[5];
-    fsm state = {MANUAL, AUTO, GAME};
-    tester tester(.rst(rst));
-    questions questions(.rst(rst));
+    game_Regfiles regfiles(.rst(rst));
   }
   
   always {
     reset_cond.in = ~rst_n;   // input raw inverted reset signal
     rst = reset_cond.out;     // conditioned reset
     button_conditioner.in = io_button[4:0];
-    tester.invalid = 0;
-    tester.start = 0;
-    questions.answer = 0;
     
     led = c{3b0, io_button};  // connect buttons to LEDs to see which button is pressed
     
@@ -43,78 +41,43 @@ module au_top (
     io_sel = 4b1111; // turn on rightmost digit, and leftmost digit
     io_led = c{{8b0}, {8b0}, {8b0}};   
     
-    alu.a = 0;
-    alu.b = 0;
-    alu.alufn_signal = 0;
-    case (state.q) {
-      // manual testing
-      state.MANUAL:
-        alu.a = a.q;
-        alu.b = b.q;
-        alu.alufn_signal = alufn.q;
-        if (button_conditioner.out[0]){
-           // store a 
-           a.d = c{io_dip[2], io_dip[1]};
-        }
+    //alu.a = 0;
+    //alu.b = 0;
+    //alu.alufn_signal = 0;
     
-        if (button_conditioner.out[1]){
-           // store b 
-          b.d = c{io_dip[2], io_dip[1]};
-        }
+    regfiles.read_address_a = address_a.q;
+    regfiles.read_address_b = address_b.q;
+    regfiles.write_address = address_write.q;
+    regfiles.data = data.q;
+    regfiles.we = we.q;
     
-        if (button_conditioner.out[2]){
-          // store alufn
-          alufn.d = io_dip[0][5:0];
-        }
-
-        // io_led[0] shows the lowest 8 bit of ALU output at all times
-        // io_led[1] shows the highest 8 bit of ALU output at all times
-        // io_led[2][2:0] shows z,v,n at all times
-        io_led = c{{c{5b0, alu.z, alu.v, alu.n}}, {alu.out[15:8]}, {alu.out[7:0]}};
-        
-        if (io_dip[0][7] == 1) {
-          // start AUTO
-          state.d = state.AUTO;
-        }
-        
-        if (button_conditioner.out[4]) {
-          // start GAME
-          state.d = state.GAME;
-        }
-      
-      // auto testing
-      state.AUTO:
-        tester.start = button_conditioner.out[3];  // start auto tester
-        tester.invalid = io_dip[0][6];  // switch to create error
-        io_seg = ~tester.io_seg;
-        io_sel = ~tester.io_sel;
-        // same implementation as state.MANUAL but io_led[2][7] shows if answer is correct
-        io_led = c{{c{tester.true, 4b0, tester.z, tester.v, tester.n}}, {tester.out[15:8]}, {tester.out[7:0]}};
-        
-        if (io_dip[0][7] == 0) {
-          // return to MANUAL
-          state.d = state.MANUAL;
-        }
-        
-        if (button_conditioner.out[4]) {
-          // start GAME
-          state.d = state.GAME;
-        }
-      
-      // function for game
-      state.GAME:
-        if (button_conditioner.out[0]) {
-          // store answer, a
-          a.d = c{io_dip[2], io_dip[1]};
-        }
-        questions.answer = a.q;
-        // display question in 7 seg
-        io_seg = ~questions.io_seg;
-        io_sel = ~questions.io_sel;
-        
-        if (button_conditioner.out[2]) {
-          // return to MANUAL
-          state.d = state.MANUAL;
-        }
-  }
+    
+    if (button_conditioner.out[0]) {  // read_address_a
+      address_a.d = io_dip[0][3:0];
+    }
+    
+    if (button_conditioner.out[1]) {  // read_address_b
+      address_b.d = io_dip[0][3:0];
+    }
+    
+    if (button_conditioner.out[2]) {  // write_address
+      address_write.d = io_dip[0][3:0];
+    }
+    
+    if (button_conditioner.out[3]) {  // data in
+      data.d = c{io_dip[2], io_dip[1]};
+    }
+    
+    if (button_conditioner.out[4]) {  // write enable
+      we.d = io_dip[0][7];
+    }
+    
+    if (io_dip[0][6]) {  // flip up to read_b else read_a
+      io_led = c{{8b0}, {regfiles.out_b[15:8]}, {regfiles.out_b[7:0]}};
+    }
+    else if (~io_dip[0][6]) {
+      io_led = c{{8b0}, {regfiles.out_a[15:8]}, {regfiles.out_a[7:0]}};
+    
+    
+    
 }
