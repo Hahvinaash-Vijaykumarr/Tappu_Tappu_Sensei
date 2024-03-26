@@ -14,10 +14,13 @@ module game_Regfiles (
     // debug
     output score[16],
     output counter_out[16],
-    output speed_and_number[2],
+    output speed_and_number[4],
     output two_led_rows[32],
     output two_comparison[2],
-    output add_and_zero_tracker[2]
+    output add_and_zero_tracker[2],
+    
+    output song_speed_ok_debug[1],
+    output song_check_debug[16]
   ) {
   .clk(clk) {
     .rst(rst) {
@@ -88,10 +91,12 @@ module game_Regfiles (
     // For debugging
     score = player_score.q;
     counter_out = game_counter.q;
-    speed_and_number = c{game_speed.q[0], song_number.q[0]};
+    speed_and_number = c{game_speed.q[1:0], song_number.q[1:0]};
     two_led_rows = c{game_led_row_1.q, game_led_row_0.q};
     two_comparison = c{compare_game_led_row_1.q[0], compare_game_led_row_0.q[0]};
     add_and_zero_tracker = c{add_score_tracker.q[0], zero_score_tracker.q[0]};
     
+    song_check_debug = song_number.q;
+    song_speed_ok_debug = game_led_row_0.q[0];
   }
 }

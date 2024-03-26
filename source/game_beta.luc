@@ -1,0 +1,89 @@
+module game_beta (
+    input clk,  // clock
+    input rst,  // reset
+    
+    input button_song[2],
+    input button_speed[2],
+    input button_ok[1],
+    
+    output song_number[2],
+    output game_speed[2],
+    output song_speed_ok_debug[1],
+    
+    
+    output state[3],
+    output song_debug[16]
+  ) {
+  
+  // temporary var
+  sig alu_a_in[16];
+  sig alu_b_in[16];
+  
+  alu game_alu;
+  
+  .clk(clk) {
+    .rst(rst) {
+      game_Controlunit game_controlunit;
+      game_Regfiles game_regfiles;
+    }
+  }
+    
+  
+  always {
+    // pass signal for button press to control unit
+    game_controlunit.button_song = button_song;
+    game_controlunit.button_speed = button_speed;
+    game_controlunit.button_ok = button_ok;
+    
+    // setting up REGFILE
+    game_regfiles.we = game_controlunit.we_regfile;
+    game_regfiles.write_address = game_controlunit.regfile_write_address;
+    
+    game_regfiles.read_address_a = game_controlunit.regfile_read_address_a;
+    game_regfiles.read_address_b = game_controlunit.regfile_read_address_b;
+    
+    // regfile detain for branching
+    
+    // asel mux
+    case (game_controlunit.asel) {
+      b000: alu_a_in = game_regfiles.out_a;
+      b001: alu_a_in = h6000;
+      b010: alu_a_in = h1800;
+      b011: alu_a_in = h0600;
+      b100: alu_a_in = h0180;
+      b101: alu_a_in = h0060;
+      b110: alu_a_in = h0018;
+      b111: alu_a_in = h0006;
+      default: alu_a_in = 0;
+    }
+    
+    // bsel mux
+    case (game_controlunit.bsel) {
+      b000: alu_b_in = game_regfiles.out_b;
+      b001: alu_b_in = h0000;
+      b010: alu_b_in = h0001;
+      // implement the 011 and 100 case
+      default: alu_b_in = 0;
+    }
+    
+    // ALU
+    game_alu.a = alu_a_in;
+    game_alu.b = alu_b_in;
+    game_alu.alufn_signal = game_controlunit.alufn;
+    
+    // wdsel mux
+    case (game_controlunit.wdsel) {
+      b01: game_regfiles.data = h0000;
+      b10: game_regfiles.data = h0001;
+      b11: game_regfiles.data = h0003;
+      default: game_regfiles.data = game_alu.out;
+    }
+    
+    
+
+    game_speed = game_regfiles.speed_and_number[3:2];
+    song_number = game_regfiles.speed_and_number[1:0];
+    song_speed_ok_debug = game_regfiles.song_speed_ok_debug;
+    state = game_controlunit.state;
+    song_debug = game_regfiles.song_check_debug;
+}

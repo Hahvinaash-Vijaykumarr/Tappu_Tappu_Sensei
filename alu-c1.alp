@@ -13,8 +13,10 @@
     <src>x_bit_left_shifter.luc</src>
     <src>boolean.luc</src>
     <component>reset_conditioner.luc</component>
+    <src>game_beta.luc</src>
     <src>bit_reverser.luc</src>
     <component>button_conditioner.luc</component>
+    <src>game_Controlunit.luc</src>
     <src>fa.luc</src>
     <src top="true">au_top.luc</src>
     <src>questions.luc</src>
@@ -23,10 +25,10 @@
     <src>shifter.luc</src>
     <src>seven_seg.luc</src>
     <src>multi_seven_seg.luc</src>
+    <component>edge_detector.luc</component>
     <src>tester.luc</src>
     <src>mux_4.luc</src>
-    <constraint lib="true">alchitry.acf</constraint>
-    <constraint lib="true">io.acf</constraint>
-    <constraint lib="true">au.xdc</constraint>
+    <constraint>custom.acf</constraint>
+    <constraint>custom_property.xdc</constraint>
   </files>
 </project>

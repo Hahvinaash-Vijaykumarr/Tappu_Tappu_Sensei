@@ -1,0 +1,109 @@
+module game_Controlunit (
+    input clk,  // clock
+    input rst,  // reset
+    // input original_counter,   // internal counter
+    // regfile detain for both a and b
+    
+    input button_song[2],  // b01 = song 1, b10 = song 2
+    input button_speed[2],  // b01 = slow song, b10 = fast song
+    input button_ok[1],  // lock in selection of speed and song
+    
+    output we_regfile,
+    output regfile_read_address_a[4],
+    output regfile_read_address_b[4],
+    output regfile_write_address[4],
+    output alufn[6],
+    output asel[3],
+    output bsel[3],
+    output wdsel[2],
+    output state[3]
+  ) {
+
+  .clk(clk) {
+    fsm game_fsm = {
+      SONGANDSPEEDSELECT,
+      SLOWSPEED,
+      FASTSPEED,
+      SONG1,
+      SONG2,
+      OK_DEBUG
+    };
+  }
+    
+  always {
+    we_regfile = 0;
+    regfile_read_address_a = 0;
+    regfile_read_address_b = 0;
+    regfile_write_address = 0;
+    alufn = 0;
+    asel = 0;
+    bsel = 0;
+    wdsel = 0;
+    state = 0;
+    // reset_counter = 0;
+    
+    if (rst) {
+      game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+      // reset counter original alchitry one too
+    }
+    else {
+    
+      case(game_fsm.q) {
+        game_fsm.SONGANDSPEEDSELECT:
+          state = h1;
+          if (button_speed == b01) {
+            game_fsm.d = game_fsm.SLOWSPEED;
+          }
+          else if (button_speed == b10) {
+            game_fsm.d = game_fsm.FASTSPEED;
+          }
+          else if (button_song == b01) {
+            game_fsm.d = game_fsm.SONG1;
+          }
+          else if (button_song == b10) {
+            game_fsm.d = game_fsm.SONG2;
+          }
+          else if (button_ok == b1) {
+            game_fsm.d = game_fsm.OK_DEBUG;
+          }
+          else {
+            game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+          }
+          
+        game_fsm.SLOWSPEED:
+          state = h2;
+          regfile_write_address = b0010;
+          wdsel = b10;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+          
+        game_fsm.FASTSPEED:
+          state = h3;
+          regfile_write_address = b0010;
+          wdsel = b11;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+          
+        game_fsm.SONG1:
+          state = h4;
+          regfile_write_address = b0011;
+          wdsel = b10;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+        
+        game_fsm.SONG2:
+          state = h5;
+          regfile_write_address = b0011;
+          wdsel = b11;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+          
+        game_fsm.OK_DEBUG:
+          state = h6;
+          regfile_write_address = b0100;  // use this register temporarily for testing
+          wdsel = b10;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.OK_DEBUG;
+
+  }
+}

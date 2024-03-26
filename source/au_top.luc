@@ -8,24 +8,42 @@ module au_top (
     output io_seg [8],      // 7-segment LEDs on IO Shield (ANODE)
     output io_sel [4],      // Digit select on IO Shield
     input io_button [5],    // 5 buttons on IO Shield
-    input io_dip [3][8]     // DIP switches on IO Shield
+    input io_dip [3][8],     // DIP switches on IO Shield
+    
+    input io_song_button[2],
+    input io_speed_button[2],
+    input io_ok_button[1]
   ) {
   
   sig rst;
-  //alu alu;
-
+  
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
     // clock. This ensures the entire FPGA comes out of reset at the same time.
     reset_conditioner reset_cond;
-    dff address_a[4](.rst(rst));
-    dff address_b[4](.rst(rst));
-    dff address_write[4](.rst(rst));
-    dff data[16](.rst(rst));
-    dff we[1](.rst(rst));
-    //dff alufn[6](.rst(rst));
+
     button_conditioner button_conditioner[5];
-    game_Regfiles regfiles(.rst(rst));
+    //edge_detector btn_debug0(#RISE(1), #FALL(0));
+    //edge_detector btn_debug1(#RISE(1), #FALL(0));
+    
+    //dff debug_button[1](.rst(rst), #INIT(0));
+    button_conditioner btn_cond_song0;
+    button_conditioner btn_cond_song1;
+    edge_detector edge_dt_song0(#RISE(1), #FALL(0));
+    edge_detector edge_dt_song1(#RISE(1), #FALL(0));
+    
+    button_conditioner btn_cond_speed0;
+    button_conditioner btn_cond_speed1;
+    edge_detector edge_dt_speed0(#RISE(1), #FALL(0));
+    edge_detector edge_dt_speed1(#RISE(1), #FALL(0));
+    
+    button_conditioner btn_cond_ok;
+    edge_detector edge_dt_ok(#RISE(1), #FALL(0));
+    
+    .rst(rst) {
+      //game_Regfiles regfiles;
+      game_beta game_unit;
+    }
   }
   
   always {
@@ -41,43 +59,31 @@ module au_top (
     io_sel = 4b1111; // turn on rightmost digit, and leftmost digit
     io_led = c{{8b0}, {8b0}, {8b0}};   
     
-    //alu.a = 0;
-    //alu.b = 0;
-    //alu.alufn_signal = 0;
+    btn_cond_song0.in = io_button[0];
+    btn_cond_song1.in = io_button[1];
+    edge_dt_song0.in = btn_cond_song0.out;
+    edge_dt_song1.in = btn_cond_song1.out;
     
-    regfiles.read_address_a = address_a.q;
-    regfiles.read_address_b = address_b.q;
-    regfiles.write_address = address_write.q;
-    regfiles.data = data.q;
-    regfiles.we = we.q;
+    btn_cond_speed0.in = io_button[2];
+    btn_cond_speed1.in = io_button[3];
+    edge_dt_speed0.in = btn_cond_speed0.out;
+    edge_dt_speed1.in = btn_cond_speed1.out;
     
+    btn_cond_ok.in = io_button[4];
+    edge_dt_ok.in = btn_cond_ok.out[0];
     
-    if (button_conditioner.out[0]) {  // read_address_a
-      address_a.d = io_dip[0][3:0];
-    }
+    game_unit.button_song = c{edge_dt_song1.out, edge_dt_song0.out};
+    game_unit.button_speed = c{edge_dt_speed1.out, edge_dt_speed0.out};
+    game_unit.button_ok = edge_dt_ok.out;
     
-    if (button_conditioner.out[1]) {  // read_address_b
-      address_b.d = io_dip[0][3:0];
-    }
+    led[0] = game_unit.song_number[0];
+    led[1] = game_unit.song_number[1];
+    led[2] = game_unit.game_speed[0];
+    led[3] = game_unit.game_speed[1];
+    led[4] = game_unit.song_speed_ok_debug[0];
     
-    if (button_conditioner.out[2]) {  // write_address
-      address_write.d = io_dip[0][3:0];
-    }
-    
-    if (button_conditioner.out[3]) {  // data in
-      data.d = c{io_dip[2], io_dip[1]};
-    }
-    
-    if (button_conditioner.out[4]) {  // write enable
-      we.d = io_dip[0][7];
-    }
-    
-    if (io_dip[0][6]) {  // flip up to read_b else read_a
-      io_led = c{{8b0}, {regfiles.out_b[15:8]}, {regfiles.out_b[7:0]}};
-    }
-    else if (~io_dip[0][6]) {
-      io_led = c{{8b0}, {regfiles.out_a[15:8]}, {regfiles.out_a[7:0]}};
-    
-    
-    
+    io_led[0][7:0] = c{5b0, game_unit.state[2:0]};
+    //io_led[1][1:0] = game_unit.song_number;
+    //io_led[1][7:6] = game_unit.game_speed[1:0];
+    io_led[2:1] = c{{game_unit.song_debug[15:8]}, {game_unit.song_debug[7:0]}};
 }
