@@ -82,8 +82,9 @@ module au_top (
     led[3] = game_unit.game_speed[1];
     led[4] = game_unit.song_speed_ok_debug[0];
     
-    io_led[0][7:0] = c{5b0, game_unit.state[2:0]};
+    
+    io_led[0][0] = game_unit.speaker;
     //io_led[1][1:0] = game_unit.song_number;
     //io_led[1][7:6] = game_unit.game_speed[1:0];
-    io_led[2:1] = c{{game_unit.song_debug[15:8]}, {game_unit.song_debug[7:0]}};
+    io_led[1] = game_unit.song_debug[7:0];
 }

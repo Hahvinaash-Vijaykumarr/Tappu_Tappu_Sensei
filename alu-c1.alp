@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="alu-c1" board="Alchitry Au" language="Lucid" version="3">
   <files>
+    <src>divide_by12.luc</src>
     <src>alu.luc</src>
     <component>pipeline.luc</component>
     <src>multiplier.luc</src>
@@ -11,6 +12,7 @@
     <src>compare.luc</src>
     <src>left_shifter_16_bit.luc</src>
     <src>x_bit_left_shifter.luc</src>
+    <src>music_ROM.luc</src>
     <src>boolean.luc</src>
     <component>reset_conditioner.luc</component>
     <src>game_beta.luc</src>
@@ -21,6 +23,7 @@
     <src top="true">au_top.luc</src>
     <src>questions.luc</src>
     <component>decoder.luc</component>
+    <src>music.luc</src>
     <src>rca.luc</src>
     <src>shifter.luc</src>
     <src>seven_seg.luc</src>

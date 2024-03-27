@@ -1,0 +1,35 @@
+module divide_by12 (
+    input clk,  // clock
+    input rst,  // reset
+    input numer[6],  // numerator
+    
+    output quotient[3],
+    output remainder[4]
+  ) {
+  dff quotient_dff[3](.clk(clk), .rst(rst));
+  dff remain_bit3_bit2[4](.clk(clk), .rst(rst));
+  
+  always {    
+    case(numer[5:2]) {
+      0: quotient_dff.d = 0; remain_bit3_bit2.d = 0;
+      1: quotient_dff.d = 0; remain_bit3_bit2.d = 1;
+      2: quotient_dff.d = 0; remain_bit3_bit2.d = 2;
+      3: quotient_dff.d = 1; remain_bit3_bit2.d = 0;
+      4: quotient_dff.d = 1; remain_bit3_bit2.d = 1;
+      5: quotient_dff.d = 1; remain_bit3_bit2.d = 2;
+      6: quotient_dff.d = 2; remain_bit3_bit2.d = 0;
+      7: quotient_dff.d = 2; remain_bit3_bit2.d = 1;
+      8: quotient_dff.d = 2; remain_bit3_bit2.d = 2;
+      9: quotient_dff.d = 3; remain_bit3_bit2.d = 0;
+      10: quotient_dff.d = 3; remain_bit3_bit2.d = 1;
+      11: quotient_dff.d = 3; remain_bit3_bit2.d = 2;
+      12: quotient_dff.d = 4; remain_bit3_bit2.d = 0;
+      13: quotient_dff.d = 4; remain_bit3_bit2.d = 1;
+      14: quotient_dff.d = 4; remain_bit3_bit2.d = 2;
+      15: quotient_dff.d = 5; remain_bit3_bit2.d = 0;
+    }
+    
+    remainder[3:0] = c{remain_bit3_bit2.q, numer[1:0]};  // first 2 bits copied through
+    quotient[2:0] = quotient_dff.q[2:0];
+    
+}

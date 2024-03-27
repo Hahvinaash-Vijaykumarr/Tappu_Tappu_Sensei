@@ -6,12 +6,13 @@ module game_beta (
     input button_speed[2],
     input button_ok[1],
     
+    output speaker,
+    
     output song_number[2],
     output game_speed[2],
     output song_speed_ok_debug[1],
     
     
-    output state[3],
     output song_debug[16]
   ) {
   
@@ -25,6 +26,7 @@ module game_beta (
     .rst(rst) {
       game_Controlunit game_controlunit;
       game_Regfiles game_regfiles;
+      music music;
     }
   }
     
@@ -43,6 +45,8 @@ module game_beta (
     game_regfiles.read_address_b = game_controlunit.regfile_read_address_b;
     
     // regfile detain for branching
+    game_controlunit.regfile_datain_a = game_regfiles.out_a;
+    game_controlunit.regfile_datain_b = game_regfiles.out_b;
     
     // asel mux
     case (game_controlunit.asel) {
@@ -79,11 +83,13 @@ module game_beta (
       default: game_regfiles.data = game_alu.out;
     }
     
-    
+    music.music_counter = game_regfiles.gcounter;
+    music.song_speed = game_regfiles.speed_num[1];  // 0 for slow, 1 for fast
+    music.song_number = game_regfiles.song_num[1];
+    speaker = music.speaker;
 
     game_speed = game_regfiles.speed_and_number[3:2];
     song_number = game_regfiles.speed_and_number[1:0];
     song_speed_ok_debug = game_regfiles.song_speed_ok_debug;
-    state = game_controlunit.state;
     song_debug = game_regfiles.song_check_debug;
 }

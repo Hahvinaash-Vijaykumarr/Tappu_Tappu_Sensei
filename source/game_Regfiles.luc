@@ -10,6 +10,10 @@ module game_Regfiles (
     output out_a[16],  // read port a
     output out_b[16],  // read port b
     
+    output gcounter[16],
+    output speed_num[2],
+    output song_num[2],
+    
     
     // debug
     output score[16],
@@ -86,7 +90,9 @@ module game_Regfiles (
       default: out_b = 0;
     }
     
-    
+    gcounter = game_counter.q;
+    speed_num[1:0] = game_speed.q[1:0];
+    song_num[1:0] = song_number.q[1:0];
     
     // For debugging
     score = player_score.q;
