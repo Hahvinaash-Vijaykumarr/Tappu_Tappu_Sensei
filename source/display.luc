@@ -1,0 +1,88 @@
+module display #(
+    COLUMN_DIMENSION = 16 : COLUMN_DIMENSION > 0,
+    ROW_DIMENSION = 16 : ROW_DIMENSION > 0
+  ) (
+    input clk,  // clock
+    input rst,  // reset
+    input address[16],
+    
+    input song_num[1],
+    output outled,  // to LED strip
+    output outled_0[32]
+//    output outled_1[32]
+  ) {
+  
+  const PIXEL_COUNT = COLUMN_DIMENSION * ROW_DIMENSION;
+  const ENCODING_AMOUNT = 4;
+  
+  // This is a custom encoding
+  // WHITE (11), BLUE (10), RED (01), GREEN (00)
+  const LEDCOLOR = {24hFFFFFF, 24hFF0000, 24h00FF00, 24h0000FF};   
+  
+  // Adjust DEPTH based on ROM size
+  display_ROM rom (#DEPTH(601));
+  
+  sig encoded_pixel_address[$clog2(PIXEL_COUNT)*$clog2(ENCODING_AMOUNT)];
+  sig current_color_encoding[$clog2(ENCODING_AMOUNT)];
+  
+  var index;
+  
+  dff led_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(PIXEL_COUNT*$clog2(ENCODING_AMOUNT)x{1})); // 2 bit to encode a color per pixel
+  dff temp_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(0)); // holds temporary value (double buffering)
+  
+  ws2812b_writer led_strip(#PIXEL_COUNT(PIXEL_COUNT), .clk(clk), .rst(rst)); 
+  fsm state(.clk(clk), .rst(rst)) = {IDLE, LOAD};
+  
+  led_reverser index_reverser(.clk(clk), .rst(rst), #COLUMN_DIMENSION(COLUMN_DIMENSION), #ROW_DIMENSION(ROW_DIMENSION));
+
+//  bit_reverser bit_reverser(#SIZE(ROW_DIMENSION*$clog2(ENCODING_AMOUNT)));
+  
+  always {
+    rom.address = 0;
+    led_strip.update = 0;
+    outled_0 = 0;
+    rom.song_num = song_num;
+//    outled_1 = 0;
+//    bit_reverser.in = 0;
+    
+    case (state.q) {
+      state.IDLE:
+        rom.address = address[9:0];
+        temp_encoding.d = rom.encoding;
+        
+//        outled_0 = rom.out0;
+//        bit_reverser.in = rom.out1;
+//        outled_1 = bit_reverser.out;
+        
+        state.d = state.LOAD;
+        
+      state.LOAD:
+        if (led_strip.reset) {
+          led_strip.update = 1;
+          led_encoding.d = temp_encoding.q;
+          
+          state.d = state.IDLE;
+        }
+    }
+    
+    // connect reverser to led_strip 
+    index_reverser.original_pixel_address = led_strip.pixel_address;
+    index_reverser.writer_pixel_done = led_strip.next_pixel;
+    index_reverser.activate = 1;
+    encoded_pixel_address = index_reverser.effective_pixel_address * $clog2(ENCODING_AMOUNT);
+    
+    // get current color encoding for this pixel
+    for (index=0; index<$clog2(ENCODING_AMOUNT); index++){
+       current_color_encoding[index] = led_encoding.q[encoded_pixel_address+index];
+    }
+    
+    // based on the encoding extracted from dff led_encoding, we get the 24bit color value
+    led_strip.color = LEDCOLOR[current_color_encoding]; 
+    outled=led_strip.led;
+    
+    
+    outled_0 = led_encoding.q[511:480];  // or issit temp_encoding???
+    
+        
+  }
+}

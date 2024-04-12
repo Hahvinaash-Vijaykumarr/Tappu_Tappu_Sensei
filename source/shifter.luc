@@ -8,8 +8,8 @@ module shifter (
   mux_2 mux_2_16_start[16];
   mux_2 mux_2_16_end[16];
   
-  bit_reverser bit_reverser_start;
-  bit_reverser bit_reverser_end;
+  bit_reverser bit_reverser_start(#SIZE(16));
+  bit_reverser bit_reverser_end(#SIZE(16));
   left_shifter_16_bit left_shifter_16_bit;
   
   var i;

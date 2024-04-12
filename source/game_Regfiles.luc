@@ -14,15 +14,21 @@ module game_Regfiles (
     output speed_num[2],
     output song_num[2],
     
+    output score[16],
+
     
     // debug
-    output score[16],
+    output compare_left_right[4],
+    
     output counter_out[16],
     output speed_and_number[4],
-    output two_led_rows[32],
-    output two_comparison[2],
+//    output two_led_rows[32],
+  //  output two_comparison[2],
     output add_and_zero_tracker[2],
     
+    
+    output one_led_row[32],
+
     output song_speed_ok_debug[1],
     output song_check_debug[16]
   ) {
@@ -30,12 +36,18 @@ module game_Regfiles (
     .rst(rst) {
       dff player_score[16](#INIT(0));
       dff game_counter[16](#INIT(0));
-      dff game_speed[16](#INIT(0));
-      dff song_number[16](#INIT(0));
-      dff game_led_row_0[16](#INIT(0));
-      dff game_led_row_1[16](#INIT(0));
-      dff compare_game_led_row_0[16](#INIT(0));
-      dff compare_game_led_row_1[16](#INIT(0));
+      dff game_speed[16](#INIT(1));
+      dff song_number[16](#INIT(1));
+      dff game_led_row_0_left[16](#INIT(0));
+      dff game_led_row_0_right[16](#INIT(0));
+//      dff game_led_row_1_left[16](#INIT(0));
+  //    dff game_led_row_1_right[16](#INIT(0));
+      dff compare_game_led_row_0_left[16](#INIT(0));
+      dff compare_game_led_row_0_right[16](#INIT(0));
+    //  dff compare_game_led_row_1_left[16](#INIT(0));
+//      dff compare_game_led_row_1_right[16](#INIT(0));
+    //  dff row_0_score_check[16](#INIT(0));
+  //    dff row_1_score_check[16](#INIT(0));
       dff add_score_tracker[16](#INIT(0));
       dff zero_score_tracker[16](#INIT(0));
     }
@@ -50,10 +62,16 @@ module game_Regfiles (
         b0001: game_counter.d = data;
         b0010: game_speed.d = data;
         b0011: song_number.d = data;
-        b0100: game_led_row_0.d = data;
-        b0101: game_led_row_1.d = data;
-        b0110: compare_game_led_row_0.d = data;
-        b0111: compare_game_led_row_1.d = data;
+        b0100: game_led_row_0_left.d = data;
+        b0101: game_led_row_0_right.d = data;
+//        b0110: game_led_row_1_left.d = data;
+  //      b0111: game_led_row_1_right.d = data;
+        b0110: compare_game_led_row_0_left.d = data;
+        b0111: compare_game_led_row_0_right.d = data;
+    //    b1010: compare_game_led_row_1_left.d = data;
+      //  b1011: compare_game_led_row_1_right.d = data;
+    //    b1100: row_0_score_check.d = data;
+      //  b1101: row_1_score_check.d = data;
         b1000: add_score_tracker.d = data;
         b1001: zero_score_tracker.d = data;
       }
@@ -66,10 +84,16 @@ module game_Regfiles (
       b0001: out_a = game_counter.q;
       b0010: out_a = game_speed.q;
       b0011: out_a = song_number.q;
-      b0100: out_a = game_led_row_0.q;
-      b0101: out_a = game_led_row_1.q;
-      b0110: out_a = compare_game_led_row_0.q;
-      b0111: out_a = compare_game_led_row_1.q;
+      b0100: out_a = game_led_row_0_left.q;
+      b0101: out_a = game_led_row_0_right.q;
+//      b0110: out_a = game_led_row_1_left.q;
+  //    b0111: out_a = game_led_row_1_right.q;
+      b0110: out_a = compare_game_led_row_0_left.q;
+      b0111: out_a = compare_game_led_row_0_right.q;
+    //  b1010: out_a = compare_game_led_row_1_left.q;
+      //b1011: out_a = compare_game_led_row_1_right.q;
+//      b1100: out_a = row_0_score_check.q;
+  //    b1101: out_a = row_1_score_check.q;
       b1000: out_a = add_score_tracker.q;
       b1001: out_a = zero_score_tracker.q;
       default: out_a = 0;
@@ -81,10 +105,16 @@ module game_Regfiles (
       b0001: out_b = game_counter.q;
       b0010: out_b = game_speed.q;
       b0011: out_b = song_number.q;
-      b0100: out_b = game_led_row_0.q;
-      b0101: out_b = game_led_row_1.q;
-      b0110: out_b = compare_game_led_row_0.q;
-      b0111: out_b = compare_game_led_row_1.q;
+      b0100: out_b = game_led_row_0_left.q;
+      b0101: out_b = game_led_row_0_right.q;
+//      b0110: out_b = game_led_row_1_left.q;
+  //    b0111: out_b = game_led_row_1_right.q;
+      b0110: out_b = compare_game_led_row_0_left.q;
+      b0111: out_b = compare_game_led_row_0_right.q;
+    //  b1010: out_b = compare_game_led_row_1_left.q;
+      //b1011: out_b = compare_game_led_row_1_right.q;
+//      b1100: out_b = row_0_score_check.q;
+  //    b1101: out_b = row_1_score_check.q;
       b1000: out_b = add_score_tracker.q;
       b1001: out_b = zero_score_tracker.q;
       default: out_b = 0;
@@ -93,16 +123,20 @@ module game_Regfiles (
     gcounter = game_counter.q;
     speed_num[1:0] = game_speed.q[1:0];
     song_num[1:0] = song_number.q[1:0];
+    score = player_score.q;
+
     
     // For debugging
-    score = player_score.q;
     counter_out = game_counter.q;
     speed_and_number = c{game_speed.q[1:0], song_number.q[1:0]};
-    two_led_rows = c{game_led_row_1.q, game_led_row_0.q};
-    two_comparison = c{compare_game_led_row_1.q[0], compare_game_led_row_0.q[0]};
+//    two_led_rows = c{game_led_row_1_left.q, game_led_row_0_left.q};
+//    two_comparison = c{compare_game_led_row_1_left.q[0], compare_game_led_row_0_left.q[0]};
+    one_led_row = c{game_led_row_0_left.q, game_led_row_0_right.q};
     add_and_zero_tracker = c{add_score_tracker.q[0], zero_score_tracker.q[0]};
     
+    compare_left_right = c{compare_game_led_row_0_left.q, compare_game_led_row_0_right.q};
+    
     song_check_debug = song_number.q;
-    song_speed_ok_debug = game_led_row_0.q[0];
+    song_speed_ok_debug = game_led_row_0_left.q[0];
   }
 }

@@ -1,9 +1,10 @@
-module bit_reverser (
-    input in[16],
-    output out[16]
+module bit_reverser #(
+    SIZE = 16 : SIZE > 0
+) (
+    input in[SIZE],
+    output out[SIZE]
   ) {
   var i;
-  const SIZE = 16;
   
   always {
     for (i=0; i<SIZE; i++){ 

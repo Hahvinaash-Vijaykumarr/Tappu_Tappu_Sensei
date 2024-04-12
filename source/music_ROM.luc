@@ -1,6 +1,6 @@
 module music_ROM (
     // input clk,  // clock
-    input counter[25],
+    input counter[10],
     input song_num[1],
     output note[8]
   ) {

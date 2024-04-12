@@ -5,15 +5,22 @@ module game_beta (
     input button_song[2],
     input button_speed[2],
     input button_ok[1],
+    input button_keys[7],
     
     output speaker,
+    output ledout,
     
     output song_number[2],
     output game_speed[2],
     output song_speed_ok_debug[1],
     
+    output score[16],
     
-    output song_debug[16]
+    output compare_left_right_debug[4],
+    
+    output led_row_0[32],
+    output song_debug[16],
+    output button_debug[1]
   ) {
   
   // temporary var
@@ -27,6 +34,7 @@ module game_beta (
       game_Controlunit game_controlunit;
       game_Regfiles game_regfiles;
       music music;
+      display display(#COLUMN_DIMENSION(16), #ROW_DIMENSION(16));
     }
   }
     
@@ -36,6 +44,7 @@ module game_beta (
     game_controlunit.button_song = button_song;
     game_controlunit.button_speed = button_speed;
     game_controlunit.button_ok = button_ok;
+    game_controlunit.button_keys = button_keys;
     
     // setting up REGFILE
     game_regfiles.we = game_controlunit.we_regfile;
@@ -48,16 +57,22 @@ module game_beta (
     game_controlunit.regfile_datain_a = game_regfiles.out_a;
     game_controlunit.regfile_datain_b = game_regfiles.out_b;
     
+    score = game_regfiles.score;
+    
+    display.song_num = game_regfiles.song_num[1];
+    display.address = game_regfiles.gcounter;
+    ledout = display.outled;
+    
+    
     // asel mux
     case (game_controlunit.asel) {
       b000: alu_a_in = game_regfiles.out_a;
-      b001: alu_a_in = h6000;
-      b010: alu_a_in = h1800;
-      b011: alu_a_in = h0600;
-      b100: alu_a_in = h0180;
-      b101: alu_a_in = h0060;
-      b110: alu_a_in = h0018;
-      b111: alu_a_in = h0006;
+      b001: alu_a_in = hC3FF;
+      b010: alu_a_in = hFC3F;
+      b011: alu_a_in = hFFC3;
+      b100: alu_a_in = hFFFC;
+      b101: alu_a_in = h3FFF;
+      b110: alu_a_in = hFFFF;
       default: alu_a_in = 0;
     }
     
@@ -66,7 +81,10 @@ module game_beta (
       b000: alu_b_in = game_regfiles.out_b;
       b001: alu_b_in = h0000;
       b010: alu_b_in = h0001;
-      // implement the 011 and 100 case
+      b011: alu_b_in = display.outled_0[31:16];
+      b100: alu_b_in = display.outled_0[15:0];
+//      b101: alu_b_in = display.outled_1[31:16];
+//      b110: alu_b_in = display.outled_1[15:0];
       default: alu_b_in = 0;
     }
     
@@ -88,8 +106,14 @@ module game_beta (
     music.song_number = game_regfiles.song_num[1];
     speaker = music.speaker;
 
+    compare_left_right_debug = game_regfiles.compare_left_right;
+    
     game_speed = game_regfiles.speed_and_number[3:2];
     song_number = game_regfiles.speed_and_number[1:0];
     song_speed_ok_debug = game_regfiles.song_speed_ok_debug;
     song_debug = game_regfiles.song_check_debug;
+    
+    button_debug = button_keys[6];
+    
+    led_row_0 = display.outled_0;
 }

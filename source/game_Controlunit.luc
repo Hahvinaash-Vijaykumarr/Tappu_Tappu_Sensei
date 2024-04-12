@@ -9,6 +9,8 @@ module game_Controlunit (
     input button_speed[2],  // b01 = slow song, b11 = fast song
     input button_ok[1],  // lock in selection of speed and song
     
+    input button_keys[7],  // player hit keys, [6] is C, [0] is B
+    
     output we_regfile,
     output regfile_read_address_a[4],
     output regfile_read_address_b[4],
@@ -16,8 +18,8 @@ module game_Controlunit (
     output alufn[6],
     output asel[3],
     output bsel[3],
-    output wdsel[2],
-    output songsel[1]
+    output wdsel[2]
+    
   ) {
 
   .clk(clk) {
@@ -27,19 +29,44 @@ module game_Controlunit (
       FASTSPEED,
       SONG1,
       SONG2,
+      CHECKEND,
       PLAY,
       INCREASEGAMECOUNTER,
-      CHECKSONGSELECTION,
-      UPDATESLOWDISPLAY,
-      BRANCHUPDATESLOWDISPLAY,
-      MUSICSLOW,
-      UPDATEFASTDISPLAY,
-      BRANCHUPDATEFASTDISPLAY,
-      MUSICFAST
+      PRESSC,
+      BRANCHPRESSCDE,
+      PRESSD,
+      PRESSE,
+      PRESSF,
+      BRANCHPRESSF,
+      PRESSG,
+      BRANCHPRESSGAB,
+      PRESSA,
+      PRESSB,
+      CHECKCOINCIDE,
+      SCORECHECK,
+      INCREASEPOINT,
+      CHECKNEGATIVE,
+      BRANCHECKNEGATIVE,
+      DECREASEPOINT,
+      END,
+      RESETSCORE,
+      RESETGAMECOUNTER,
+      RESETROW0
+      
+//      CHECKSONGSELECTION,
+  //    UPDATESLOWDISPLAY,
+    //  BRANCHUPDATESLOWDISPLAY1,
+      //BRANCHUPDATESLOWDISPLAY2,
+//      BRANCHUPDATESLOWDISPLAY3,
+  //    MUSICSLOW,
+    //  UPDATEFASTDISPLAY,
+      //BRANCHUPDATEFASTDISPLAY1,
+//      MUSICFAST
     };
     
     .rst(rst) {
       dff game_counter[25];
+      dff button_keys_dff[7];
     }
   }
     
@@ -52,18 +79,44 @@ module game_Controlunit (
     asel = 0;
     bsel = 0;
     wdsel = 0;
-    songsel = 0;
     // reset_counter = 0; maybe dont need
     game_counter.d = game_counter.q + 1;
+    
+    button_keys_dff.d = 0;  // idk if this should be here!!!!!
+    
+    if (button_keys[6] == b1) {
+      button_keys_dff.d[6] = 1;
+    }
+    if (button_keys[5] == b1) {
+      button_keys_dff.d[5] = 1;
+    }
+    if (button_keys[4] == b1) {
+      button_keys_dff.d[4] = 1;
+    }
+    if (button_keys[3] == b1) {
+      button_keys_dff.d[3] = 1;
+    }
+    if (button_keys[2] == b1) {
+      button_keys_dff.d[2] = 1;
+    }
+    if (button_keys[1] == b1) {
+      button_keys_dff.d[1] = 1;
+    }
+    if (button_keys[0] == b1) {
+      button_keys_dff.d[0] = 1;
+    }
 
     if (rst) {
       game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+      // change game_fsm to END OR SOMETHING
       // reset counter original alchitry one too?
     }
     else {
     
       case(game_fsm.q) {
         game_fsm.SONGANDSPEEDSELECT:
+          button_keys_dff.d = 0;
+          
           if (button_speed == b01) {
             game_fsm.d = game_fsm.SLOWSPEED;
           }
@@ -107,23 +160,58 @@ module game_Controlunit (
           we_regfile = b1;
           game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
           
+        game_fsm.CHECKEND:
+          alufn = b011100;
+          bsel = b011;
+          regfile_write_address = b0100;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.PLAY;
+          
         game_fsm.PLAY:
           regfile_read_address_a = b0010;
           regfile_read_address_b = b0100;
           we_regfile = b0;
         
-          // ADD LOGIC FOR THE END GAME STATES
-        
+          if (regfile_datain_b == 16hDDDD) {
+            game_fsm.d = game_fsm.END;
+          }
+
+          else if (button_keys_dff.q[6]) {
+            game_fsm.d = game_fsm.PRESSC;
+          }
+          else if (button_keys_dff.q[5]) {
+            game_fsm.d = game_fsm.PRESSD;
+          }
+          else if (button_keys_dff.q[4]) {
+            game_fsm.d = game_fsm.PRESSE;
+          }
+          else if (button_keys_dff.q[3]) {
+            game_fsm.d = game_fsm.PRESSF;
+          }
+          else if (button_keys_dff.q[2]) {
+            game_fsm.d = game_fsm.PRESSG;
+          }
+          else if (button_keys_dff.q[1]) {
+            game_fsm.d = game_fsm.PRESSA;
+          }
+          else if (button_keys_dff.q[0]) {
+            game_fsm.d = game_fsm.PRESSB;
+          }
+
+          else {
+            game_fsm.d = game_fsm.PLAY;
+          }
+          
+          
+          // SUS??
           if (regfile_datain_a[1:0] == b01 && game_counter.q[24] == 1 && game_counter.q[23] == 1) {  // slow song
             game_fsm.d = game_fsm.INCREASEGAMECOUNTER;
           }
           else if (regfile_datain_a[1:0] == b11 && game_counter.q[24] == 1) {
             game_fsm.d = game_fsm.INCREASEGAMECOUNTER;
           }
-          else {
-            game_fsm.d = game_fsm.CHECKSONGSELECTION;
-          }
-          
+           
         game_fsm.INCREASEGAMECOUNTER:
           alufn = b000000;
           asel = b000;
@@ -133,12 +221,191 @@ module game_Controlunit (
           wdsel = b00;
           we_regfile = b1;
           game_counter.d = 0;
-          game_fsm.d = game_fsm.PLAY;  // edit back
+          game_fsm.d = game_fsm.CHECKEND;
           
-        game_fsm.CHECKSONGSELECTION:
-          regfile_read_address_a = b0011;
+        game_fsm.PRESSC:
+          alufn = b110011;
+          asel = b001;
+          bsel = b011;
+          regfile_write_address = b0110;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSCDE;
+          
+        game_fsm.BRANCHPRESSCDE:
+          alufn = b110011;
+          asel = b110;
+          bsel = b100;
+          regfile_write_address = b0111;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.CHECKCOINCIDE;
+        
+        game_fsm.PRESSD:
+          alufn = b110011;
+          asel = b010;
+          bsel = b011;
+          regfile_write_address = b0110;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSCDE;
+          
+        game_fsm.PRESSE:
+          alufn = b110011;
+          asel = b011;
+          bsel = b011;
+          regfile_write_address = b0110;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSCDE;
+          
+        game_fsm.PRESSF:
+          alufn = b110011;
+          asel = b100;
+          bsel = b011;
+          regfile_write_address = b0110;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSF;
+          
+        game_fsm.BRANCHPRESSF:
+          alufn = b110011;
+          asel = b101;
+          bsel = b100;
+          regfile_write_address = b0111;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.CHECKCOINCIDE;
+          
+        game_fsm.PRESSG:
+          alufn = b110011;
+          asel = b001;
+          bsel = b100;
+          regfile_write_address = b0111;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSGAB;
+          
+        game_fsm.BRANCHPRESSGAB:
+          alufn = b110011;
+          asel = b110;
+          bsel = b011;
+          regfile_write_address = b0110;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.CHECKCOINCIDE;
+        
+        game_fsm.PRESSA:
+          alufn = b110011;
+          asel = b010;
+          bsel = b100;
+          regfile_write_address = b0111;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSGAB;
+          
+        game_fsm.PRESSB:
+          alufn = b110011;
+          asel = b011;
+          bsel = b100;
+          regfile_write_address = b0111;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHPRESSGAB;
+          
+        game_fsm.CHECKCOINCIDE:
+          alufn = b011000;
+          asel = b000;
+          bsel = b000;
+          regfile_read_address_a = b0110;
+          regfile_read_address_b = b0111;
+          regfile_write_address = b1000;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.SCORECHECK;
+          
+        game_fsm.SCORECHECK:
+          regfile_read_address_a = b1000;
           we_regfile = b0;
-          game_fsm.d = game_fsm.PLAY;  // edit back
+          
+          if (regfile_datain_a[0] == b1) {
+            game_fsm.d = game_fsm.INCREASEPOINT;
+          }
+          else if (regfile_datain_a[0] == b0) {
+            game_fsm.d = game_fsm.CHECKNEGATIVE;
+          }
+          
+        game_fsm.INCREASEPOINT:
+          alufn = b000000;
+          asel = b000;
+          bsel = b010;
+          regfile_read_address_a = b0000;
+          regfile_write_address = b0000;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.CHECKEND;
+        
+        game_fsm.CHECKNEGATIVE:
+          alufn = b110011;
+          asel = b000;
+          bsel = b001;
+          regfile_read_address_a = b0000;
+          regfile_write_address = b1001;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.BRANCHECKNEGATIVE;
+          
+        game_fsm.BRANCHECKNEGATIVE:
+          regfile_read_address_a = b1001;
+          we_regfile = b0;
+          
+          if (regfile_datain_a[0] == b1) {
+            game_fsm.d = game_fsm.CHECKEND;
+          }
+          else if (regfile_datain_a[0] == b0) {
+            game_fsm.d = game_fsm.DECREASEPOINT;
+          }
+          
+        game_fsm.DECREASEPOINT:
+          alufn = b000001;
+          asel = b00;
+          bsel = b010;
+          regfile_read_address_a = b0000;
+          regfile_write_address = b0000;
+          wdsel = b00;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.CHECKEND;
+          
+        game_fsm.END:
+          if (button_ok) {
+            game_fsm.d = game_fsm.RESETSCORE;
+          }
+          else {
+            game_fsm.d = game_fsm.END;
+          }
+          
+        game_fsm.RESETSCORE:
+          regfile_write_address = b0000;
+          wdsel = b01;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.RESETGAMECOUNTER;
+          
+        game_fsm.RESETGAMECOUNTER:
+          regfile_write_address = b0001;
+          wdsel = b01;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.RESETROW0;
+        
+        game_fsm.RESETROW0:
+          regfile_write_address = b0100;
+          wdsel = b01;
+          we_regfile = b1;
+          game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
+          
+//        game_fsm.CHECKSONGSELECTION:
+  //        regfile_read_address_a = b0011;
+    //      we_regfile = b0;
+      //    game_fsm.d = game_fsm.PLAY;  // edit back
           
           //if (regfile_datain_a[1:0] == b01) {
             //game_fsm.d = game_fsm.UPDATESLOWDISPLAY;
@@ -147,10 +414,10 @@ module game_Controlunit (
            // game_fsm.d = game_fsm.UPDATEFASTDISPLAY;
           //}
         
-        game_fsm.UPDATESLOWDISPLAY:  // to test music, edit to display later
-          regfile_read_address_a = b0001;
-          songsel = b0;
-          we_regfile = b0;
+//        game_fsm.UPDATESLOWDISPLAY:  // to test music, edit to display later
+  //        regfile_read_address_a = b0001;
+    //      songsel = b0;
+      //    we_regfile = b0;
 
   }
 }

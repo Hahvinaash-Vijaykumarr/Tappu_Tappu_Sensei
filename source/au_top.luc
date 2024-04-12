@@ -8,14 +8,16 @@ module au_top (
     output io_seg [8],      // 7-segment LEDs on IO Shield (ANODE)
     output io_sel [4],      // Digit select on IO Shield
     input io_button [5],    // 5 buttons on IO Shield
-    input io_dip [3][8],     // DIP switches on IO Shield
     
     input io_song_button[2],
     input io_speed_button[2],
-    input io_ok_button[1]
+    input io_ok_button[1],
+    input io_keys[7],
+    output led_out[1]
   ) {
   
   sig rst;
+  
   
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
@@ -40,6 +42,9 @@ module au_top (
     button_conditioner btn_cond_ok;
     edge_detector edge_dt_ok(#RISE(1), #FALL(0));
     
+    button_conditioner btn_cond_keys[7];
+    edge_detector edge_dt_keys[7](#RISE(1), #FALL(0));
+    
     .rst(rst) {
       //game_Regfiles regfiles;
       game_beta game_unit;
@@ -57,7 +62,6 @@ module au_top (
     
     io_seg = 8b0; // connect segments to the driver
     io_sel = 4b1111; // turn on rightmost digit, and leftmost digit
-    io_led = c{{8b0}, {8b0}, {8b0}};   
     
     btn_cond_song0.in = io_button[0];
     btn_cond_song1.in = io_button[1];
@@ -72,19 +76,37 @@ module au_top (
     btn_cond_ok.in = io_button[4];
     edge_dt_ok.in = btn_cond_ok.out[0];
     
+    btn_cond_keys.in = io_keys;
+    edge_dt_keys.in = btn_cond_keys.out;
+        
     game_unit.button_song = c{edge_dt_song1.out, edge_dt_song0.out};
     game_unit.button_speed = c{edge_dt_speed1.out, edge_dt_speed0.out};
     game_unit.button_ok = edge_dt_ok.out;
+    game_unit.button_keys = edge_dt_keys.out;
+    
+    led_out = game_unit.ledout;
     
     led[0] = game_unit.song_number[0];
     led[1] = game_unit.song_number[1];
     led[2] = game_unit.game_speed[0];
     led[3] = game_unit.game_speed[1];
     led[4] = game_unit.song_speed_ok_debug[0];
+        
+    io_led[1][4] = game_unit.speaker;
+
+    io_led[1][1:0] = game_unit.song_number;
+    io_led[1][7:6] = game_unit.game_speed;
     
     
-    io_led[0][0] = game_unit.speaker;
-    //io_led[1][1:0] = game_unit.song_number;
-    //io_led[1][7:6] = game_unit.game_speed[1:0];
-    io_led[1] = game_unit.song_debug[7:0];
+//    io_led[1] = game_unit.song_debug[7:0];
+//    display.address = 0;
+    
+  io_led[2][3:0] = game_unit.score[3:0];
+    
+//  io_led[2][7:4] = game_unit.compare_left_right_debug;
+
+  //    io_led[2] = display.outled_0[31:24];
+  //  io_led[1] = display.outled_0[23:16];
+    
+    
 }
