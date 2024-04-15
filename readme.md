@@ -14,7 +14,16 @@ Add details about your prototype here, perhaps a few photos and how-to-use would
 
 ### Proposed project
 
-The game starts off with a car being stationary on a road, displayed on the screen. When the player presses start, a multiplication question will be shown below the car, with a timer for 15 seconds and a obstacle, like a stone, appears before the car. As the timer countdowns the car will be head towards the obstacle. If the player inputs the wrong answer, the countdown will continue and the car will continue to head towards the obstacle. If the player does not answer correctly by the time the timer runs out, the car will hit the obstacle and the game would end. If the player inputs the correct answer, the car will avoid the obstacle and the game will move on to the next question with the timer resetted. The game will have 2 modes, easy and hard. The easy mode would have 15 second intervals per question and the hard mode would have 8 seconds interval per question.
+The game is designed as a readaptation of the idea of Taiko no Tatsujin, where players must follow the falling musical notes in the right sequence. This aims to train players on their hand-eye coordination, and also what notes correspond to what sound, like C, D, E, etc. Players would be required to use a drumstick to hit the corresponding notes whenever the falling musical notes passes below a certain line to gain points. If they hit a note at the wrong time, they would lose a point. A 16 x 16 ws2812b LED display is used to display the falling notes.
+
+### User Manual
+
+1. Players can select a song from 2 different songs using 2 song selection buttons.
+2. Players can select a speed (fast or slow) using 2 speed selection buttons.
+3. Press 'OK' button to begin the game.
+4. Game starts and player has to hit the corresponding notes when it reaches the bottom of the LED.
+5. At the end of the game, press 'OK' to play again.
+
 
 ### ALU
 
