@@ -3,22 +3,9 @@ clock clk 100MHz;
 
 pin rst_n RESET;
 
-pin led[0] B21;
-pin led[1] B20;
-pin led[2] B18;
-pin led[3] B17;
-pin led[4] B15;
-pin led[5] B14;
-pin led[6] B12;
-pin led[7] B11;
-
 // flip the Tx/Rx lines
 pin usb_rx USB_TX;
 pin usb_tx USB_RX;
-
-//pin custom_out[0] C49;
-//pin customout[1] C48;
-//pin customout[2] C2;
 
 pin io_led[0][0] B21;
 pin io_led[0][1] B20;
@@ -63,24 +50,17 @@ pin io_seg[2] A48;
 pin io_seg[3] A46;
 pin io_seg[4] A45;
 pin io_seg[5] A3;
-pin io_seg[6] A2;
+pin io_seg[6] D9;
 pin io_seg[7] A49;
 
-pin io_song_button[0] C48 pulldown;
-pin io_song_button[1] C2 pulldown;
+pin io_keys[0] C5 pulldown;  // B
+pin io_keys[1] C45 pulldown;  // A
+pin io_keys[2] C46 pulldown;  // G
+pin io_keys[3] C43 pulldown;  // F
+pin io_keys[4] C42 pulldown;  // E
+pin io_keys[5] C8 pulldown;  // D
+pin io_keys[6] C9 pulldown;  // C
 
-pin io_speed_button[0] C3 pulldown;
-pin io_speed_button[1] C6 pulldown;
+pin led_out[0] C39;
 
-pin io_ok_button[0] C49 pulldown;
-
-pin io_keys[0] C5 pulldown;  // B30
-pin io_keys[1] C45 pulldown;  // B33
-pin io_keys[2] C46 pulldown;  // B36
-pin io_keys[3] C43 pulldown;  // B39
-pin io_keys[4] C42 pulldown;  // B42
-pin io_keys[5] C8 pulldown;  // B45
-pin io_keys[6] C9 pulldown;  // B48
-
-
-pin led_out[0] C40;
+pin music[0] B3;

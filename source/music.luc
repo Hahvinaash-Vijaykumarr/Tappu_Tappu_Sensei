@@ -1,7 +1,7 @@
 module music (
     input clk,  // clock
     input rst,  // reset
-    input song_number[1],  // b0 or b1 for the 2 different songs
+    input song_number[1],     // b0 or b1 for the 2 different songs
     input music_counter[16],  // music counter
     input song_speed[1],
     
@@ -29,14 +29,14 @@ module music (
     case(note) {
       0: clkdivider.d = 511;  // A
       1: clkdivider.d = 482;  // A#/Bb
-      2: clkdivider.d = 455; // B
-      3: clkdivider.d = 430; // C
-      4: clkdivider.d = 405; // C#/Db
-      5: clkdivider.d = 383; // D
-      6: clkdivider.d = 361; // D#/Eb
-      7: clkdivider.d = 341; // E
-      8: clkdivider.d = 322; // F
-      9: clkdivider.d = 303; // F#/Gb
+      2: clkdivider.d = 455;  // B
+      3: clkdivider.d = 430;  // C
+      4: clkdivider.d = 405;  // C#/Db
+      5: clkdivider.d = 383;  // D
+      6: clkdivider.d = 361;  // D#/Eb
+      7: clkdivider.d = 341;  // E
+      8: clkdivider.d = 322;  // F
+      9: clkdivider.d = 303;  // F#/Gb
       10: clkdivider.d = 286; // G
       11: clkdivider.d = 270; // G#/Ab
       default: clkdivider.d = 0;

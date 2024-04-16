@@ -1,41 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="alu-c1" board="Alchitry Au" language="Lucid" version="3">
   <files>
-    <src>divide_by12.luc</src>
-    <src>alu.luc</src>
     <component>pipeline.luc</component>
-    <src>multiplier.luc</src>
-    <src>adder.luc</src>
     <component>counter.luc</component>
-    <src>led_reverser.luc</src>
-    <src>mux_2.luc</src>
-    <src>game_Regfiles.luc</src>
-    <src>compare.luc</src>
-    <src>left_shifter_16_bit.luc</src>
-    <src>x_bit_left_shifter.luc</src>
-    <src>music_ROM.luc</src>
-    <src>display_ROM.luc</src>
-    <src>boolean.luc</src>
-    <component>reset_conditioner.luc</component>
-    <src>game_beta.luc</src>
     <src>bit_reverser.luc</src>
-    <component>button_conditioner.luc</component>
-    <src>game_Controlunit.luc</src>
-    <src>fa.luc</src>
+    <src>adder.luc</src>
+    <src>display_ROM.luc</src>
+    <src>ws2812b_writer.luc</src>
+    <src>divide_by12.luc</src>
+    <src>mux_2.luc</src>
     <src top="true">au_top.luc</src>
-    <src>display.luc</src>
-    <src>questions.luc</src>
+    <component>reset_conditioner.luc</component>
+    <src>compare.luc</src>
+    <src>multiplier.luc</src>
+    <src>music_ROM.luc</src>
+    <component>button_conditioner.luc</component>
+    <src>x_bit_left_shifter.luc</src>
+    <src>shifter.luc</src>
+    <src>boolean.luc</src>
+    <src>game_beta.luc</src>
     <component>decoder.luc</component>
     <src>music.luc</src>
-    <src>rca.luc</src>
-    <src>ws2812b_writer.luc</src>
-    <src>shifter.luc</src>
-    <src>seven_seg.luc</src>
-    <src>multi_seven_seg.luc</src>
-    <component>edge_detector.luc</component>
-    <src>tester.luc</src>
+    <src>game_Controlunit.luc</src>
     <src>mux_4.luc</src>
-    <constraint>custom.acf</constraint>
+    <src>rca.luc</src>
+    <src>multi_seven_seg.luc</src>
+    <src>led_reverser.luc</src>
+    <src>left_shifter_16_bit.luc</src>
+    <src>alu.luc</src>
+    <src>fa.luc</src>
+    <src>seven_seg.luc</src>
+    <component>edge_detector.luc</component>
+    <src>game_Regfiles.luc</src>
+    <src>display.luc</src>
+    <src>score_converter.luc</src>
     <constraint>custom_property.xdc</constraint>
+    <constraint>custom.acf</constraint>
   </files>
 </project>

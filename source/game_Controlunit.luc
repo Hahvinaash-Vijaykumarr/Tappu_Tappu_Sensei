@@ -1,7 +1,6 @@
 module game_Controlunit (
     input clk,  // clock
     input rst,  // reset
-    // input original_counter,   // internal counter
     input regfile_datain_a[16],  // direct read of regfile data from read_address_a
     input regfile_datain_b[16],  // direct read of regfile data from read_address_b
     
@@ -52,16 +51,6 @@ module game_Controlunit (
       RESETSCORE,
       RESETGAMECOUNTER,
       RESETROW0
-      
-//      CHECKSONGSELECTION,
-  //    UPDATESLOWDISPLAY,
-    //  BRANCHUPDATESLOWDISPLAY1,
-      //BRANCHUPDATESLOWDISPLAY2,
-//      BRANCHUPDATESLOWDISPLAY3,
-  //    MUSICSLOW,
-    //  UPDATEFASTDISPLAY,
-      //BRANCHUPDATEFASTDISPLAY1,
-//      MUSICFAST
     };
     
     .rst(rst) {
@@ -79,11 +68,11 @@ module game_Controlunit (
     asel = 0;
     bsel = 0;
     wdsel = 0;
-    // reset_counter = 0; maybe dont need
+    
     game_counter.d = game_counter.q + 1;
+    button_keys_dff.d = 0;
     
-    button_keys_dff.d = 0;  // idk if this should be here!!!!!
-    
+    // Recording note presses
     if (button_keys[6] == b1) {
       button_keys_dff.d[6] = 1;
     }
@@ -106,29 +95,34 @@ module game_Controlunit (
       button_keys_dff.d[0] = 1;
     }
 
+    // Reset game -- score, game counter
     if (rst) {
-      game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
-      // change game_fsm to END OR SOMETHING
-      // reset counter original alchitry one too?
+      game_fsm.d = game_fsm.RESETSCORE;
     }
     else {
-    
+        
       case(game_fsm.q) {
+      
         game_fsm.SONGANDSPEEDSELECT:
           button_keys_dff.d = 0;
           
+          // Slow song
           if (button_speed == b01) {
             game_fsm.d = game_fsm.SLOWSPEED;
           }
+          // Fast song
           else if (button_speed == b10) {
             game_fsm.d = game_fsm.FASTSPEED;
           }
+          // Song 1
           else if (button_song == b01) {
             game_fsm.d = game_fsm.SONG1;
           }
+          // Song 2
           else if (button_song == b10) {
             game_fsm.d = game_fsm.SONG2;
           }
+          // Locked in selections
           else if (button_ok == b1) {
             game_fsm.d = game_fsm.PLAY;
           }
@@ -137,64 +131,70 @@ module game_Controlunit (
           }
           
         game_fsm.SLOWSPEED:
-          regfile_write_address = b0010;
-          wdsel = b10;
+          regfile_write_address = b0010;  // speed reg
+          wdsel = b10;                    // constant 1
           we_regfile = b1;
           game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
           
         game_fsm.FASTSPEED:
-          regfile_write_address = b0010;
-          wdsel = b11;
+          regfile_write_address = b0010;  // speed reg
+          wdsel = b11;                    // constant 3
           we_regfile = b1;
           game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
           
         game_fsm.SONG1:
-          regfile_write_address = b0011;
-          wdsel = b10;
+          regfile_write_address = b0011;  // song reg
+          wdsel = b10;                    // constant 1
           we_regfile = b1;
           game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
         
         game_fsm.SONG2:
-          regfile_write_address = b0011;
-          wdsel = b11;
+          regfile_write_address = b0011;  // song reg
+          wdsel = b11;                    // constant 3
           we_regfile = b1;
           game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
           
         game_fsm.CHECKEND:
-          alufn = b011100;
-          bsel = b011;
-          regfile_write_address = b0100;
+          alufn = b011100;                // "B"
+          bsel = b011;                    // last row of led, led[31:16]
+          regfile_write_address = b0100;  // last row of led[31:16] reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.PLAY;
           
         game_fsm.PLAY:
-          regfile_read_address_a = b0010;
-          regfile_read_address_b = b0100;
+          regfile_read_address_a = b0010;  // speed reg
+          regfile_read_address_b = b0100;  // last row of led[31:16] reg
           we_regfile = b0;
         
-          if (regfile_datain_b == 16hDDDD) {
+          if (regfile_datain_b == 16hDDDD) {  // direct read in and compare
             game_fsm.d = game_fsm.END;
           }
-
+          // key C pressed
           else if (button_keys_dff.q[6]) {
             game_fsm.d = game_fsm.PRESSC;
           }
+          // key D pressed
           else if (button_keys_dff.q[5]) {
             game_fsm.d = game_fsm.PRESSD;
           }
+          // key E pressed
           else if (button_keys_dff.q[4]) {
             game_fsm.d = game_fsm.PRESSE;
           }
+          // key F pressed
           else if (button_keys_dff.q[3]) {
             game_fsm.d = game_fsm.PRESSF;
           }
+          // key G pressed
           else if (button_keys_dff.q[2]) {
             game_fsm.d = game_fsm.PRESSG;
           }
+          // key A pressed
           else if (button_keys_dff.q[1]) {
             game_fsm.d = game_fsm.PRESSA;
           }
+          // key B pressed
           else if (button_keys_dff.q[0]) {
             game_fsm.d = game_fsm.PRESSB;
           }
@@ -204,7 +204,7 @@ module game_Controlunit (
           }
           
           
-          // SUS??
+          // increment game counter based on speed
           if (regfile_datain_a[1:0] == b01 && game_counter.q[24] == 1 && game_counter.q[23] == 1) {  // slow song
             game_fsm.d = game_fsm.INCREASEGAMECOUNTER;
           }
@@ -213,170 +213,173 @@ module game_Controlunit (
           }
            
         game_fsm.INCREASEGAMECOUNTER:
-          alufn = b000000;
+          alufn = b000000;                // ADD
           asel = b000;
-          bsel = b010;
-          regfile_read_address_a = b0001;
-          regfile_write_address = b0001;
+          bsel = b010;                    // constant 1
+          regfile_read_address_a = b0001; // counter reg
+          regfile_write_address = b0001;  // counter reg
           wdsel = b00;
           we_regfile = b1;
           game_counter.d = 0;
           game_fsm.d = game_fsm.CHECKEND;
           
         game_fsm.PRESSC:
-          alufn = b110011;
-          asel = b001;
-          bsel = b011;
-          regfile_write_address = b0110;
+          alufn = b110011;                // CMPEQ
+          asel = b001;                    // constant C3FF
+          bsel = b011;                    // last row of led, led[31:16]
+          regfile_write_address = b0101;  // compare left side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSCDE;
           
         game_fsm.BRANCHPRESSCDE:
-          alufn = b110011;
-          asel = b110;
-          bsel = b100;
-          regfile_write_address = b0111;
+          alufn = b110011;                // CMPEQ
+          asel = b110;                    // constant FFFF
+          bsel = b100;                    // last row of led, led[15:0]
+          regfile_write_address = b0110;  // compare right side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.CHECKCOINCIDE;
         
         game_fsm.PRESSD:
-          alufn = b110011;
-          asel = b010;
-          bsel = b011;
-          regfile_write_address = b0110;
+          alufn = b110011;                // CMPEQ
+          asel = b010;                    // constant FC3F
+          bsel = b011;                    // last row of led, led[31:16]
+          regfile_write_address = b0101;  // compare left side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSCDE;
           
         game_fsm.PRESSE:
-          alufn = b110011;
-          asel = b011;
-          bsel = b011;
-          regfile_write_address = b0110;
+          alufn = b110011;                // CMPEQ
+          asel = b011;                    // constant FFC3
+          bsel = b011;                    // last row of led, led[31:16]
+          regfile_write_address = b0101;  // compare left side of last row of led reg  
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSCDE;
           
         game_fsm.PRESSF:
-          alufn = b110011;
-          asel = b100;
-          bsel = b011;
-          regfile_write_address = b0110;
+          alufn = b110011;                // CMPEQ
+          asel = b100;                    // constant FFFC
+          bsel = b011;                    // last row of led, led[31:16]
+          regfile_write_address = b0101;  // compare left side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSF;
           
         game_fsm.BRANCHPRESSF:
-          alufn = b110011;
-          asel = b101;
-          bsel = b100;
-          regfile_write_address = b0111;
+          alufn = b110011;                // CMPEQ
+          asel = b101;                    // constant 3FFF
+          bsel = b100;                    // last row of led, led[15:0]
+          regfile_write_address = b0110;  // compare right side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.CHECKCOINCIDE;
           
         game_fsm.PRESSG:
-          alufn = b110011;
-          asel = b001;
-          bsel = b100;
-          regfile_write_address = b0111;
+          alufn = b110011;                // CMPEQ
+          asel = b001;                    // constant C3FF
+          bsel = b100;                    // last row of led, led[15:0]
+          regfile_write_address = b0110;  // compare right side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSGAB;
           
         game_fsm.BRANCHPRESSGAB:
-          alufn = b110011;
-          asel = b110;
-          bsel = b011;
-          regfile_write_address = b0110;
+          alufn = b110011;                // CMPEQ
+          asel = b110;                    // constant FFFF
+          bsel = b011;                    // last row of led, led[31:16]
+          regfile_write_address = b0101;  // compare left side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.CHECKCOINCIDE;
         
         game_fsm.PRESSA:
-          alufn = b110011;
-          asel = b010;
-          bsel = b100;
-          regfile_write_address = b0111;
+          alufn = b110011;                // CMPEQ
+          asel = b010;                    // constant FC3F
+          bsel = b100;                    // last row of led, led[31:16]
+          regfile_write_address = b0110;  // compare right side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSGAB;
           
         game_fsm.PRESSB:
-          alufn = b110011;
-          asel = b011;
-          bsel = b100;
-          regfile_write_address = b0111;
+          alufn = b110011;                // CMPEQ
+          asel = b011;                    // constant FFC3
+          bsel = b100;                    // last row of led, led[31:16]
+          regfile_write_address = b0110;  // compare right side of last row of led reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHPRESSGAB;
           
         game_fsm.CHECKCOINCIDE:
-          alufn = b011000;
+          alufn = b011000;                // AND
           asel = b000;
           bsel = b000;
-          regfile_read_address_a = b0110;
-          regfile_read_address_b = b0111;
-          regfile_write_address = b1000;
+          regfile_read_address_a = b0101; // compare left side of last row led reg
+          regfile_read_address_b = b0110; // compare right side of last row of led reg
+          regfile_write_address = b0111;  // add score tracker reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.SCORECHECK;
           
         game_fsm.SCORECHECK:
-          regfile_read_address_a = b1000;
+          regfile_read_address_a = b0111; // add score tracker reg
           we_regfile = b0;
           
-          if (regfile_datain_a[0] == b1) {
+          // direct read in
+          if (regfile_datain_a[0] == b1) {        // gain point if hit note at right time
             game_fsm.d = game_fsm.INCREASEPOINT;
           }
-          else if (regfile_datain_a[0] == b0) {
+          else if (regfile_datain_a[0] == b0) {   // lose point if fail to hit note at right time
             game_fsm.d = game_fsm.CHECKNEGATIVE;
           }
           
         game_fsm.INCREASEPOINT:
-          alufn = b000000;
+          alufn = b000000;                // ADD
           asel = b000;
-          bsel = b010;
-          regfile_read_address_a = b0000;
-          regfile_write_address = b0000;
+          bsel = b010;                    // constant 1
+          regfile_read_address_a = b0000; // player score reg
+          regfile_write_address = b0000;  // player score reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.CHECKEND;
         
         game_fsm.CHECKNEGATIVE:
-          alufn = b110011;
+          alufn = b110011;                // CMPEQ
           asel = b000;
-          bsel = b001;
-          regfile_read_address_a = b0000;
-          regfile_write_address = b1001;
+          bsel = b001;                    // constant 0
+          regfile_read_address_a = b0000; // player score reg
+          regfile_write_address = b1000;  // zero score reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.BRANCHECKNEGATIVE;
           
         game_fsm.BRANCHECKNEGATIVE:
-          regfile_read_address_a = b1001;
+          regfile_read_address_a = b1000; // zero score reg
           we_regfile = b0;
           
-          if (regfile_datain_a[0] == b1) {
+          // direct read in
+          if (regfile_datain_a[0] == b1) {       // don't lose points if player has no points
             game_fsm.d = game_fsm.CHECKEND;
           }
-          else if (regfile_datain_a[0] == b0) {
+          else if (regfile_datain_a[0] == b0) {  // lose a point if player has score > 0
             game_fsm.d = game_fsm.DECREASEPOINT;
           }
           
         game_fsm.DECREASEPOINT:
-          alufn = b000001;
-          asel = b00;
-          bsel = b010;
-          regfile_read_address_a = b0000;
-          regfile_write_address = b0000;
+          alufn = b000001;                // SUB
+          asel = b000;
+          bsel = b010;                    // constant 1
+          regfile_read_address_a = b0000; // player score reg
+          regfile_write_address = b0000;  // player score reg
           wdsel = b00;
           we_regfile = b1;
           game_fsm.d = game_fsm.CHECKEND;
           
         game_fsm.END:
+          // Press ok to restart the game
           if (button_ok) {
             game_fsm.d = game_fsm.RESETSCORE;
           }
@@ -385,39 +388,21 @@ module game_Controlunit (
           }
           
         game_fsm.RESETSCORE:
-          regfile_write_address = b0000;
-          wdsel = b01;
+          regfile_write_address = b0000;  // player score reg
+          wdsel = b01;                    // constant 0
           we_regfile = b1;
           game_fsm.d = game_fsm.RESETGAMECOUNTER;
           
         game_fsm.RESETGAMECOUNTER:
-          regfile_write_address = b0001;
+          regfile_write_address = b0001;  // counter reg
           wdsel = b01;
           we_regfile = b1;
           game_fsm.d = game_fsm.RESETROW0;
         
         game_fsm.RESETROW0:
-          regfile_write_address = b0100;
-          wdsel = b01;
+          regfile_write_address = b0100;  // last row of led, led[31:16] reg
+          wdsel = b01;                    // constant 0
           we_regfile = b1;
           game_fsm.d = game_fsm.SONGANDSPEEDSELECT;
-          
-//        game_fsm.CHECKSONGSELECTION:
-  //        regfile_read_address_a = b0011;
-    //      we_regfile = b0;
-      //    game_fsm.d = game_fsm.PLAY;  // edit back
-          
-          //if (regfile_datain_a[1:0] == b01) {
-            //game_fsm.d = game_fsm.UPDATESLOWDISPLAY;
-          //}
-          //else if (regfile_datain_a[1:0] == b11) {
-           // game_fsm.d = game_fsm.UPDATEFASTDISPLAY;
-          //}
-        
-//        game_fsm.UPDATESLOWDISPLAY:  // to test music, edit to display later
-  //        regfile_read_address_a = b0001;
-    //      songsel = b0;
-      //    we_regfile = b0;
-
   }
 }

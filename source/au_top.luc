@@ -1,7 +1,6 @@
 module au_top (
     input clk,              // 100MHz clock
     input rst_n,            // reset button (active low)
-    output led [8],         // 8 user controllable LEDs
     input usb_rx,           // USB->Serial input
     output usb_tx,          // USB->Serial output
     output io_led [3][8],   // LEDs on IO Shield
@@ -9,104 +8,97 @@ module au_top (
     output io_sel [4],      // Digit select on IO Shield
     input io_button [5],    // 5 buttons on IO Shield
     
-    input io_song_button[2],
-    input io_speed_button[2],
-    input io_ok_button[1],
-    input io_keys[7],
-    output led_out[1]
+    input io_keys[7],          // Notes button
+    output led_out[1],         // Display output
+    output music[1]            // Music output
   ) {
   
   sig rst;
-  
+  score_converter score;
   
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
     // clock. This ensures the entire FPGA comes out of reset at the same time.
     reset_conditioner reset_cond;
 
-    button_conditioner button_conditioner[5];
-    //edge_detector btn_debug0(#RISE(1), #FALL(0));
-    //edge_detector btn_debug1(#RISE(1), #FALL(0));
-    
-    //dff debug_button[1](.rst(rst), #INIT(0));
+    // Conditioner and detector for song selection button
     button_conditioner btn_cond_song0;
     button_conditioner btn_cond_song1;
     edge_detector edge_dt_song0(#RISE(1), #FALL(0));
     edge_detector edge_dt_song1(#RISE(1), #FALL(0));
     
+    // Conditioner and detector for speed selection button
     button_conditioner btn_cond_speed0;
     button_conditioner btn_cond_speed1;
     edge_detector edge_dt_speed0(#RISE(1), #FALL(0));
     edge_detector edge_dt_speed1(#RISE(1), #FALL(0));
     
+    // Conditioner and detector for ok button
     button_conditioner btn_cond_ok;
     edge_detector edge_dt_ok(#RISE(1), #FALL(0));
     
+    // Conditioner and detector for keys buttons
     button_conditioner btn_cond_keys[7];
     edge_detector edge_dt_keys[7](#RISE(1), #FALL(0));
     
     .rst(rst) {
-      //game_Regfiles regfiles;
       game_beta game_unit;
+      multi_seven_seg seg(#DIGITS(3));
     }
   }
   
   always {
     reset_cond.in = ~rst_n;   // input raw inverted reset signal
     rst = reset_cond.out;     // conditioned reset
-    button_conditioner.in = io_button[4:0];
-    
-    led = c{3b0, io_button};  // connect buttons to LEDs to see which button is pressed
-    
+        
     usb_tx = usb_rx;          // loop serial port
     
-    io_seg = 8b0; // connect segments to the driver
-    io_sel = 4b1111; // turn on rightmost digit, and leftmost digit
+//    io_seg = 8b0; // connect segments to the driver
+//    io_sel = 4b1111; // turn on rightmost digit, and leftmost digit
     
+    
+    // Connecting song selection buttons
     btn_cond_song0.in = io_button[0];
     btn_cond_song1.in = io_button[1];
     edge_dt_song0.in = btn_cond_song0.out;
     edge_dt_song1.in = btn_cond_song1.out;
     
+    // Connecting speed selection buttons
     btn_cond_speed0.in = io_button[2];
     btn_cond_speed1.in = io_button[3];
     edge_dt_speed0.in = btn_cond_speed0.out;
     edge_dt_speed1.in = btn_cond_speed1.out;
     
+    // Connecting ok selection button
     btn_cond_ok.in = io_button[4];
     edge_dt_ok.in = btn_cond_ok.out[0];
     
+    // Connecting keys buttons
     btn_cond_keys.in = io_keys;
     edge_dt_keys.in = btn_cond_keys.out;
         
+    // Passing button inputs to game_beta
     game_unit.button_song = c{edge_dt_song1.out, edge_dt_song0.out};
     game_unit.button_speed = c{edge_dt_speed1.out, edge_dt_speed0.out};
     game_unit.button_ok = edge_dt_ok.out;
     game_unit.button_keys = edge_dt_keys.out;
     
-    led_out = game_unit.ledout;
     
-    led[0] = game_unit.song_number[0];
-    led[1] = game_unit.song_number[1];
-    led[2] = game_unit.game_speed[0];
-    led[3] = game_unit.game_speed[1];
-    led[4] = game_unit.song_speed_ok_debug[0];
-        
+    // Output
+    led_out = game_unit.ledout;
+    music = game_unit.speaker;
+    
+    score.score = game_unit.score;
+    seg.values = {score.hundreds, score.tens, score.ones};
+    io_seg = seg.seg;
+    io_sel = ~seg.sel;
+    
+    
+    // debug
     io_led[1][4] = game_unit.speaker;
-
+    
     io_led[1][1:0] = game_unit.song_number;
     io_led[1][7:6] = game_unit.game_speed;
     
-    
-//    io_led[1] = game_unit.song_debug[7:0];
-//    display.address = 0;
-    
-  io_led[2][3:0] = game_unit.score[3:0];
-    
-//  io_led[2][7:4] = game_unit.compare_left_right_debug;
-
-  //    io_led[2] = display.outled_0[31:24];
-  //  io_led[1] = display.outled_0[23:16];
-    
-    
+    io_led[2] = game_unit.score[7:0];
 }

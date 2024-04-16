@@ -20,7 +20,7 @@ module display #(
   const LEDCOLOR = {24hFFFFFF, 24hFF0000, 24h00FF00, 24h0000FF};   
   
   // Adjust DEPTH based on ROM size
-  display_ROM rom (#DEPTH(601));
+  display_ROM rom (#DEPTH(617));
   
   sig encoded_pixel_address[$clog2(PIXEL_COUNT)*$clog2(ENCODING_AMOUNT)];
   sig current_color_encoding[$clog2(ENCODING_AMOUNT)];
@@ -34,26 +34,18 @@ module display #(
   fsm state(.clk(clk), .rst(rst)) = {IDLE, LOAD};
   
   led_reverser index_reverser(.clk(clk), .rst(rst), #COLUMN_DIMENSION(COLUMN_DIMENSION), #ROW_DIMENSION(ROW_DIMENSION));
-
-//  bit_reverser bit_reverser(#SIZE(ROW_DIMENSION*$clog2(ENCODING_AMOUNT)));
   
   always {
     rom.address = 0;
     led_strip.update = 0;
     outled_0 = 0;
     rom.song_num = song_num;
-//    outled_1 = 0;
-//    bit_reverser.in = 0;
     
     case (state.q) {
+    
       state.IDLE:
         rom.address = address[9:0];
         temp_encoding.d = rom.encoding;
-        
-//        outled_0 = rom.out0;
-//        bit_reverser.in = rom.out1;
-//        outled_1 = bit_reverser.out;
-        
         state.d = state.LOAD;
         
       state.LOAD:
@@ -81,7 +73,7 @@ module display #(
     outled=led_strip.led;
     
     
-    outled_0 = led_encoding.q[511:480];  // or issit temp_encoding???
+    outled_0 = led_encoding.q[511:480];
     
         
   }

@@ -12,15 +12,8 @@ module game_beta (
     
     output song_number[2],
     output game_speed[2],
-    output song_speed_ok_debug[1],
     
-    output score[16],
-    
-    output compare_left_right_debug[4],
-    
-    output led_row_0[32],
-    output song_debug[16],
-    output button_debug[1]
+    output score[16]
   ) {
   
   // temporary var
@@ -53,16 +46,26 @@ module game_beta (
     game_regfiles.read_address_a = game_controlunit.regfile_read_address_a;
     game_regfiles.read_address_b = game_controlunit.regfile_read_address_b;
     
+    score = game_regfiles.score;
+
     // regfile detain for branching
     game_controlunit.regfile_datain_a = game_regfiles.out_a;
     game_controlunit.regfile_datain_b = game_regfiles.out_b;
     
-    score = game_regfiles.score;
-    
+    // reading speed and song selection
+    game_speed = game_regfiles.speed_and_number[3:2];
+    song_number = game_regfiles.speed_and_number[1:0];  
+      
+    // setting up display
     display.song_num = game_regfiles.song_num[1];
     display.address = game_regfiles.gcounter;
     ledout = display.outled;
     
+    // setting up music -- 0 for slow, 1 for fast
+    music.music_counter = game_regfiles.gcounter;
+    music.song_speed = game_regfiles.speed_num[1];
+    music.song_number = game_regfiles.song_num[1];
+    speaker = music.speaker;
     
     // asel mux
     case (game_controlunit.asel) {
@@ -83,8 +86,6 @@ module game_beta (
       b010: alu_b_in = h0001;
       b011: alu_b_in = display.outled_0[31:16];
       b100: alu_b_in = display.outled_0[15:0];
-//      b101: alu_b_in = display.outled_1[31:16];
-//      b110: alu_b_in = display.outled_1[15:0];
       default: alu_b_in = 0;
     }
     
@@ -100,20 +101,4 @@ module game_beta (
       b11: game_regfiles.data = h0003;
       default: game_regfiles.data = game_alu.out;
     }
-    
-    music.music_counter = game_regfiles.gcounter;
-    music.song_speed = game_regfiles.speed_num[1];  // 0 for slow, 1 for fast
-    music.song_number = game_regfiles.song_num[1];
-    speaker = music.speaker;
-
-    compare_left_right_debug = game_regfiles.compare_left_right;
-    
-    game_speed = game_regfiles.speed_and_number[3:2];
-    song_number = game_regfiles.speed_and_number[1:0];
-    song_speed_ok_debug = game_regfiles.song_speed_ok_debug;
-    song_debug = game_regfiles.song_check_debug;
-    
-    button_debug = button_keys[6];
-    
-    led_row_0 = display.outled_0;
 }

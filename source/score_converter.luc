@@ -1,0 +1,17 @@
+module score_converter (
+    input score[16],
+    
+    output ones[4],
+    output tens[4],
+    output hundreds[4]
+  ) {
+  sig hundred[4];
+  sig ten[4];
+  always {
+    hundred = score/100;
+    hundreds = hundred;
+    ten = (score - hundred*100) / 10;
+    tens = ten;
+    ones = (score - hundred*100 - ten*10);
+  }
+}
