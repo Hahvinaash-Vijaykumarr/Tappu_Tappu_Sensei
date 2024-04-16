@@ -24,6 +24,8 @@ The game is designed as a readaptation of the idea of Taiko no Tatsujin, where p
 4. Game starts and player has to hit the corresponding notes when it reaches the bottom of the LED.
 5. At the end of the game, press 'OK' to play again.
 
+### Prototype
+![Protoype design](https://github.com/50002-computation-structures/1d-project-14/blob/master/images/Prototype.jpg)
 
 ### ALU
 
