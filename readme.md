@@ -54,8 +54,3 @@ io_button[3] -> left button
 io_button[4] -> right button
 
 ![Picture](https://github.com/50002-computation-structures/1d-project-14/assets/122805747/929f3786-eac3-42f6-b950-190cca37507e)
-
-
-### Other Details
-
-Any other details
