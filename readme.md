@@ -8,11 +8,7 @@ Harsh Hareendran Kalinkeel  1007116
 Sushmitha Elangovan         1007050  
 Pea Jun Hao Darren          1006859  
 
-### The Project
-
-Add details about your prototype here, perhaps a few photos and how-to-use would be great.
-
-### Proposed project
+### Project
 
 The game is designed as a readaptation of the idea of Taiko no Tatsujin, where players must follow the falling musical notes in the right sequence. This aims to train players on their hand-eye coordination, and also what notes correspond to what sound, like C, D, E, etc. Players would be required to use a drumstick to hit the corresponding notes whenever the falling musical notes passes below a certain line to gain points. If they hit a note at the wrong time, they would lose a point. A 16 x 16 ws2812b LED display is used to display the falling notes.
 
